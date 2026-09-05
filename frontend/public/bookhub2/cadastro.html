@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Crie sua conta BookHub gratuitamente." />
+  <title>Cadastro | BookHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/bookhub-auth.css" />
+</head>
+<body class="auth-page">
+  <div class="auth-shell">
+    <aside class="auth-brand" aria-label="BookHub">
+      <div class="auth-brand-inner">
+        <a class="auth-logo" href="login.html">BookHub</a>
+
+        <div class="auth-hero">
+          <h1>Registre os livros que você já leu.</h1>
+          <p>Salve aqueles que você quer e compartilhe com seus amigos o que você achou bom.</p>
+        </div>
+      </div>
+    </aside>
+
+    <main class="auth-panel">
+      <div class="auth-form-wrap">
+        <h2>Cadastro</h2>
+        <p class="auth-sub">
+          Já possui conta? <a href="login.html">Faça login</a>
+        </p>
+
+        <div class="auth-message auth-message--error" data-auth-message hidden role="alert"></div>
+
+        <form id="register-form" novalidate>
+          <div class="auth-field">
+            <label for="name">Nome</label>
+            <div class="auth-input-wrap">
+              <input
+                type="text"
+                id="name"
+                name="name"
+                autocomplete="name"
+                placeholder="Seu nome"
+                minlength="2"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="auth-field">
+            <label for="email">Email</label>
+            <div class="auth-input-wrap">
+              <input
+                type="email"
+                id="email"
+                name="email"
+                autocomplete="email"
+                placeholder="seu@email.com"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="auth-field">
+            <label for="password">Senha</label>
+            <div class="auth-input-wrap">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                autocomplete="new-password"
+                placeholder="********"
+                minlength="8"
+                required
+              />
+              <button
+                type="button"
+                class="auth-toggle-pw"
+                data-toggle-password
+                aria-controls="password"
+                aria-label="Mostrar senha"
+                aria-pressed="false"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="auth-field">
+            <label for="passwordConfirm">Confirmação de senha</label>
+            <div class="auth-input-wrap">
+              <input
+                type="password"
+                id="passwordConfirm"
+                name="passwordConfirm"
+                autocomplete="new-password"
+                placeholder="********"
+                minlength="8"
+                required
+              />
+            </div>
+          </div>
+
+          <button type="submit" class="auth-submit">Cadastrar</button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/auth-config.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Catálogo de sabores Açai Energy: opções, tamanhos e preços. Espaços prontos para adicionar imagens." />
+  <title>Catálogo | Açai Energy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%234c1f6d'/><path fill='%23bff400' d='M18 6l-2 8h4l-6 14 2-9H12l6-13z'/></svg>" />
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "x4kwf1gvym");
+</script>
+</head>
+<body class="page-catalogo">
+  <a class="skip-link" href="#conteudo-principal">Pular para o conteúdo principal</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="logo" href="index.html" aria-label="Energy Açaí — página inicial">
+        <img
+          class="logo-img"
+          src="assets/logo-energy-acai.png"
+          width="200"
+          height="200"
+          alt="Energy Açaí — Do corpo para sua rotina."
+        />
+      </a>
+      <nav class="nav" aria-label="Principal">
+        <a href="index.html">Início</a>
+        <a href="index.html#produto">Produto</a>
+        <a href="catalogo.html" aria-current="page">Catálogo</a>
+        <a href="pesquisas.html">Pesquisa</a>
+        <a href="empresa.html">Empresa</a>
+        <a href="login.html">Login</a>
+        <a class="nav-cta" href="cadastro.html">Cadastro</a>
+        <a class="nav-cta" href="index.html#contato">Onde encontrar</a>
+        <button class="cart-link" type="button" id="cart-open" aria-label="Abrir carrinho">
+          Carrinho <span class="cart-count" id="cart-count">0</span>
+        </button>
+      </nav>
+      <button type="button" class="menu-toggle" aria-expanded="false" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="conteudo-principal">
+    <header class="catalog-hero">
+      <div class="wrap catalog-hero-inner">
+        <div>
+          <p class="page-breadcrumb"><a href="index.html">Início</a> · Catálogo</p>
+          <h1>Catálogo de sabores</h1>
+          <p class="catalog-sub">
+            Escolha seu sabor, confira os valores e monte seu pedido no varejo — linha clássica 300 ml e performance 500 ml com suplemento.
+          </p>
+        </div>
+        <div class="catalog-badges" aria-label="Destaques">
+          <span class="badge">Pronto para beber</span>
+          <span class="badge badge--lime">Energia no corre</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="catalog-section" aria-labelledby="sabores-titulo">
+      <div class="wrap">
+        <h2 id="sabores-titulo" class="catalog-title">Sabores e valores</h2>
+        <p class="catalog-intro">
+          Preços sugeridos para apresentação do projeto. Ajuste livremente conforme tamanho, região e canal (varejo/atacado).
+        </p>
+
+        <div class="catalog-grid">
+          <article class="catalog-card" data-flavor="Tradicional" data-base300="9.90" data-base500="14.90" data-supp-name="Guaraná" data-supp-extra="3.00">
+            <div class="catalog-img-slot">
+              <img src="assets/catalogo/tradicional.png" width="800" height="500" alt="Açai Energy Tradicional — garrafas 300 ml e 500 ml com guaraná" loading="lazy" decoding="async" />
+            </div>
+            <div class="catalog-card-body">
+              <div class="catalog-card-top">
+                <h3>Tradicional</h3>
+                <span class="tag">Mais vendido</span>
+              </div>
+              <p class="catalog-desc">Açaí intenso, equilibrado e perfeito para o dia a dia.</p>
+              <div class="catalog-price-chips" aria-label="Preços Tradicional">
+                <span class="chip">300 ml · R$ 9,90</span>
+                <span class="chip">500 ml · R$ 14,90</span>
+                <span class="chip chip--supp">+ Guaraná · +R$ 3,00</span>
+              </div>
+
+              <form class="buy-box" aria-label="Comprar Tradicional no varejo">
+                <div class="buy-row">
+                  <label class="buy-field">
+                    <span class="buy-label">Tamanho</span>
+                    <select class="buy-select" name="size" aria-label="Tamanho">
+                      <option value="300">300 ml</option>
+                      <option value="500">500 ml</option>
+                    </select>
+                  </label>
+                  <label class="buy-field buy-field--toggle">
+                    <span class="buy-label">Suplemento</span>
+                    <span class="toggle">
+                      <input class="buy-supp" type="checkbox" name="supp" />
+                      <span class="toggle-ui" aria-hidden="true"></span>
+                      <span class="toggle-text">+ Guaraná</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="buy-row buy-row--bottom">
+                  <div class="buy-price" aria-label="Preço">
+                    <span class="buy-price-label">Total</span>
+                    <strong class="buy-price-value" data-price>R$ 9,90</strong>
+                  </div>
+                  <button class="btn btn-primary buy-btn" type="button" data-add-to-cart>Adicionar</button>
+                </div>
+              </form>
+            </div>
+          </article>
+
+          <article class="catalog-card" data-flavor="Banana" data-base300="10.90" data-base500="15.90" data-supp-name="Whey" data-supp-extra="3.00">
+            <div class="catalog-img-slot">
+              <img src="assets/catalogo/banana.png" width="800" height="500" alt="Açai Energy Banana — garrafas com opção whey protein" loading="lazy" decoding="async" />
+            </div>
+            <div class="catalog-card-body">
+              <div class="catalog-card-top">
+                <h3>Banana</h3>
+                <span class="tag tag--soft">Cremoso</span>
+              </div>
+              <p class="catalog-desc">Açaí com banana: sensação mais doce e textura ainda mais aveludada.</p>
+              <div class="catalog-price-chips" aria-label="Preços Banana">
+                <span class="chip">300 ml · R$ 10,90</span>
+                <span class="chip">500 ml · R$ 15,90</span>
+                <span class="chip chip--supp">+ Whey · +R$ 3,00</span>
+              </div>
+
+              <form class="buy-box" aria-label="Comprar Banana no varejo">
+                <div class="buy-row">
+                  <label class="buy-field">
+                    <span class="buy-label">Tamanho</span>
+                    <select class="buy-select" name="size" aria-label="Tamanho">
+                      <option value="300">300 ml</option>
+                      <option value="500">500 ml</option>
+                    </select>
+                  </label>
+                  <label class="buy-field buy-field--toggle">
+                    <span class="buy-label">Suplemento</span>
+                    <span class="toggle">
+                      <input class="buy-supp" type="checkbox" name="supp" />
+                      <span class="toggle-ui" aria-hidden="true"></span>
+                      <span class="toggle-text">+ Whey</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="buy-row buy-row--bottom">
+                  <div class="buy-price" aria-label="Preço">
+                    <span class="buy-price-label">Total</span>
+                    <strong class="buy-price-value" data-price>R$ 10,90</strong>
+                  </div>
+                  <button class="btn btn-primary buy-btn" type="button" data-add-to-cart>Adicionar</button>
+                </div>
+              </form>
+            </div>
+          </article>
+
+          <article class="catalog-card" data-flavor="Morango" data-base300="10.90" data-base500="15.90" data-supp-name="Whey" data-supp-extra="3.00">
+            <div class="catalog-img-slot">
+              <img src="assets/catalogo/morango.png" width="800" height="500" alt="Açai Energy Morango — garrafas Strawberry Boost e Strength Power" loading="lazy" decoding="async" />
+            </div>
+            <div class="catalog-card-body">
+              <div class="catalog-card-top">
+                <h3>Morango</h3>
+                <span class="tag tag--soft">Frutado</span>
+              </div>
+              <p class="catalog-desc">Toque fresco e aroma marcante para variar a rotina sem perder o açaí.</p>
+              <div class="catalog-price-chips" aria-label="Preços Morango">
+                <span class="chip">300 ml · R$ 10,90</span>
+                <span class="chip">500 ml · R$ 15,90</span>
+                <span class="chip chip--supp">+ Whey · +R$ 3,00</span>
+              </div>
+
+              <form class="buy-box" aria-label="Comprar Morango no varejo">
+                <div class="buy-row">
+                  <label class="buy-field">
+                    <span class="buy-label">Tamanho</span>
+                    <select class="buy-select" name="size" aria-label="Tamanho">
+                      <option value="300">300 ml</option>
+                      <option value="500">500 ml</option>
+                    </select>
+                  </label>
+                  <label class="buy-field buy-field--toggle">
+                    <span class="buy-label">Suplemento</span>
+                    <span class="toggle">
+                      <input class="buy-supp" type="checkbox" name="supp" />
+                      <span class="toggle-ui" aria-hidden="true"></span>
+                      <span class="toggle-text">+ Whey</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="buy-row buy-row--bottom">
+                  <div class="buy-price" aria-label="Preço">
+                    <span class="buy-price-label">Total</span>
+                    <strong class="buy-price-value" data-price>R$ 10,90</strong>
+                  </div>
+                  <button class="btn btn-primary buy-btn" type="button" data-add-to-cart>Adicionar</button>
+                </div>
+              </form>
+            </div>
+          </article>
+
+          <article class="catalog-card" data-flavor="Cupuaçu" data-base300="11.90" data-base500="16.90" data-supp-name="Cafeína" data-supp-extra="3.00">
+            <div class="catalog-img-slot">
+              <img src="assets/catalogo/cupuacu.png" width="800" height="500" alt="Açai Energy Cupuaçu — garrafas com cafeína" loading="lazy" decoding="async" />
+            </div>
+            <div class="catalog-card-body">
+              <div class="catalog-card-top">
+                <h3>Cupuaçu</h3>
+                <span class="tag tag--soft">Amazônico</span>
+              </div>
+              <p class="catalog-desc">Combinação clássica: acidez leve e final refrescante.</p>
+              <div class="catalog-price-chips" aria-label="Preços Cupuaçu">
+                <span class="chip">300 ml · R$ 11,90</span>
+                <span class="chip">500 ml · R$ 16,90</span>
+                <span class="chip chip--supp">+ Cafeína · +R$ 3,00</span>
+              </div>
+
+              <form class="buy-box" aria-label="Comprar Cupuaçu no varejo">
+                <div class="buy-row">
+                  <label class="buy-field">
+                    <span class="buy-label">Tamanho</span>
+                    <select class="buy-select" name="size" aria-label="Tamanho">
+                      <option value="300">300 ml</option>
+                      <option value="500">500 ml</option>
+                    </select>
+                  </label>
+                  <label class="buy-field buy-field--toggle">
+                    <span class="buy-label">Suplemento</span>
+                    <span class="toggle">
+                      <input class="buy-supp" type="checkbox" name="supp" />
+                      <span class="toggle-ui" aria-hidden="true"></span>
+                      <span class="toggle-text">+ Cafeína</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="buy-row buy-row--bottom">
+                  <div class="buy-price" aria-label="Preço">
+                    <span class="buy-price-label">Total</span>
+                    <strong class="buy-price-value" data-price>R$ 11,90</strong>
+                  </div>
+                  <button class="btn btn-primary buy-btn" type="button" data-add-to-cart>Adicionar</button>
+                </div>
+              </form>
+            </div>
+          </article>
+
+          <article class="catalog-card" data-flavor="Cacau" data-base300="11.90" data-base500="16.90" data-supp-name="Whey" data-supp-extra="3.00">
+            <div class="catalog-img-slot">
+              <img src="assets/catalogo/cacau.png" width="800" height="500" alt="Açai Energy Cacau — garrafas com whey protein" loading="lazy" decoding="async" />
+            </div>
+            <div class="catalog-card-body">
+              <div class="catalog-card-top">
+                <h3>Cacau</h3>
+                <span class="tag tag--soft">Mais forte</span>
+              </div>
+              <p class="catalog-desc">Perfil intenso e “adulto”, ideal para quem curte menos doçura.</p>
+              <div class="catalog-price-chips" aria-label="Preços Cacau">
+                <span class="chip">300 ml · R$ 11,90</span>
+                <span class="chip">500 ml · R$ 16,90</span>
+                <span class="chip chip--supp">+ Whey · +R$ 3,00</span>
+              </div>
+
+              <form class="buy-box" aria-label="Comprar Cacau no varejo">
+                <div class="buy-row">
+                  <label class="buy-field">
+                    <span class="buy-label">Tamanho</span>
+                    <select class="buy-select" name="size" aria-label="Tamanho">
+                      <option value="300">300 ml</option>
+                      <option value="500">500 ml</option>
+                    </select>
+                  </label>
+                  <label class="buy-field buy-field--toggle">
+                    <span class="buy-label">Suplemento</span>
+                    <span class="toggle">
+                      <input class="buy-supp" type="checkbox" name="supp" />
+                      <span class="toggle-ui" aria-hidden="true"></span>
+                      <span class="toggle-text">+ Whey</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="buy-row buy-row--bottom">
+                  <div class="buy-price" aria-label="Preço">
+                    <span class="buy-price-label">Total</span>
+                    <strong class="buy-price-value" data-price>R$ 11,90</strong>
+                  </div>
+                  <button class="btn btn-primary buy-btn" type="button" data-add-to-cart>Adicionar</button>
+                </div>
+              </form>
+            </div>
+          </article>
+
+          <article class="catalog-card" data-flavor="Zero Açúcar" data-base300="12.90" data-base500="17.90" data-supp-name="Creatina" data-supp-extra="3.00">
+            <div class="catalog-img-slot">
+              <img src="assets/catalogo/zero-acucar.png" width="800" height="500" alt="Açai Energy Zero Açúcar — linha com creatina" loading="lazy" decoding="async" />
+            </div>
+            <div class="catalog-card-body">
+              <div class="catalog-card-top">
+                <h3>Zero Açúcar</h3>
+                <span class="tag">Linha Fit</span>
+              </div>
+              <p class="catalog-desc">Opção para quem quer reduzir açúcar mantendo sabor e praticidade.</p>
+              <div class="catalog-price-chips" aria-label="Preços Zero Açúcar">
+                <span class="chip">300 ml · R$ 12,90</span>
+                <span class="chip">500 ml · R$ 17,90</span>
+                <span class="chip chip--supp">+ Creatina · +R$ 3,00</span>
+              </div>
+
+              <form class="buy-box" aria-label="Comprar Zero Açúcar no varejo">
+                <div class="buy-row">
+                  <label class="buy-field">
+                    <span class="buy-label">Tamanho</span>
+                    <select class="buy-select" name="size" aria-label="Tamanho">
+                      <option value="300">300 ml</option>
+                      <option value="500">500 ml</option>
+                    </select>
+                  </label>
+                  <label class="buy-field buy-field--toggle">
+                    <span class="buy-label">Suplemento</span>
+                    <span class="toggle">
+                      <input class="buy-supp" type="checkbox" name="supp" />
+                      <span class="toggle-ui" aria-hidden="true"></span>
+                      <span class="toggle-text">+ Creatina</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="buy-row buy-row--bottom">
+                  <div class="buy-price" aria-label="Preço">
+                    <span class="buy-price-label">Total</span>
+                    <strong class="buy-price-value" data-price>R$ 12,90</strong>
+                  </div>
+                  <button class="btn btn-primary buy-btn" type="button" data-add-to-cart>Adicionar</button>
+                </div>
+              </form>
+            </div>
+          </article>
+        </div>
+
+        <p class="catalog-intro" style="margin-top: 1.5rem; margin-bottom: 0;">
+          Imagens ilustrativas dos rótulos. Valores e disponibilidade podem variar por região e ponto de venda.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <aside class="cart-drawer" id="cart-drawer" aria-label="Carrinho" aria-hidden="true">
+    <div class="cart-panel" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+      <div class="cart-header">
+        <h2 id="cart-title">Carrinho (varejo)</h2>
+        <button class="cart-close" type="button" id="cart-close" aria-label="Fechar carrinho">Fechar</button>
+      </div>
+
+      <div class="cart-body">
+        <ul class="cart-items" id="cart-items" aria-label="Itens do carrinho"></ul>
+
+        <div class="cart-summary" aria-label="Resumo">
+          <div class="cart-total">
+            <span>Total</span>
+            <strong id="cart-total">R$ 0,00</strong>
+          </div>
+          <p class="cart-hint">Finalização via WhatsApp (sem pagamento integrado).</p>
+        </div>
+
+        <form class="checkout" id="checkout" aria-label="Dados para entrega">
+          <div class="checkout-grid">
+            <label class="checkout-field">
+              <span>Nome</span>
+              <input type="text" name="nome" placeholder="Seu nome" autocomplete="name" />
+            </label>
+            <label class="checkout-field">
+              <span>Telefone</span>
+              <input type="tel" name="telefone" placeholder="(DDD) 9xxxx-xxxx" autocomplete="tel" />
+            </label>
+            <label class="checkout-field checkout-field--full">
+              <span>Endereço</span>
+              <input type="text" name="endereco" placeholder="Rua, número, bairro, cidade" autocomplete="street-address" />
+            </label>
+          </div>
+
+          <div class="checkout-actions">
+            <button class="btn btn-ghost" type="button" id="cart-clear">Limpar</button>
+            <button class="btn btn-primary" type="button" id="checkout-whatsapp">Finalizar no WhatsApp</button>
+          </div>
+          <p class="checkout-note">
+            Dica: troque o número do WhatsApp no arquivo <code>js/main.js</code> quando tiver o contato oficial.
+          </p>
+        </form>
+      </div>
+    </div>
+  </aside>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div class="footer-brand">
+        <span class="logo-text logo-text--footer">Açai <strong>Energy</strong></span>
+        <p class="footer-tag">Açaí engarrafado. Praticidade e produtividade.</p>
+      </div>
+      <div class="footer-meta">
+        <p><a href="catalogo.html">Catálogo</a> · <a href="empresa.html">Empresa</a> · <a href="pesquisas.html">Pesquisa</a> · <a href="index.html#contato">Contato</a></p>
+        <p>© <span id="year"></span> Açai Energy. Todos os direitos reservados.</p>
+        <p class="footer-small">Produto sujeito à disponibilidade.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
