@@ -49,7 +49,7 @@
   function moneyBRL(value) {
     try {
       return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-    } catch (e) {
+    } catch {
       return "R$ " + String(value).replace(".", ",");
     }
   }
@@ -59,7 +59,7 @@
       var raw = localStorage.getItem(CART_KEY);
       var parsed = raw ? JSON.parse(raw) : [];
       return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
+    } catch {
       return [];
     }
   }
@@ -67,7 +67,9 @@
   function saveCart(cart) {
     try {
       localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    } catch (e) {}
+    } catch {
+      return;
+    }
   }
 
   function cartCountTotal(cart) {
