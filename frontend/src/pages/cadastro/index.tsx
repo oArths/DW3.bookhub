@@ -18,7 +18,7 @@ export default function Cadastro(){
       <div className="auth-form-wrap">
         <h2>Cadastro</h2>
         <p className="auth-sub">
-          Já possui conta? <a href="login.html">Faça login</a>
+          Já possui conta? <a href="/">Faça login</a>
         </p>
 
         <div className="auth-message auth-message--error" data-auth-message hidden role="alert"></div>
