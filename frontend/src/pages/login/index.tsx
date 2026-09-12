@@ -5,7 +5,7 @@ export default function Login() {
         <aside className="auth-brand" aria-label="BookHub">
             
             <div className="auth-brand-inner">
-                <a className="auth-logo" href="login.html">
+                <a className="auth-logo" href="/">
                     <span className="auth-logo-mark" aria-hidden="true">📖</span>
                     BookHub
                 </a>
@@ -32,7 +32,7 @@ export default function Login() {
             <div className="auth-form-wrap">
                 <h2>Entrar na conta</h2>
                 <p className="auth-sub">
-                    Ainda não tem conta? <a href="cadastro.html">Cadastre-se grátis</a>
+                    Ainda não tem conta? <a href="/cadastro">Cadastre-se grátis</a>
                 </p>
 
                 <div className="auth-message auth-message--error" data-auth-message hidden role="alert"></div>
@@ -54,7 +54,7 @@ export default function Login() {
                     <div className="auth-field">
                         <div className="auth-field-header">
                             <label >Senha</label>
-                            <a href="recuperar-senha.html">Esqueceu a senha?</a>
+                            <a href="/recuperar-senha">Esqueceu a senha?</a>
                         </div>
                         <div className="auth-input-wrap">
                             <input
@@ -83,8 +83,6 @@ export default function Login() {
 
                     <button type="submit" className="auth-submit">Entrar</button>
                 </form>
-
-                <p className="auth-divider">ou continue com</p>
 
                 <p className="auth-legal">
                     Ao entrar, você concorda com nossos

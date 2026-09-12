@@ -56,7 +56,7 @@ export default function Cadastro() {
         transition={Bounce}
       />
       <div className="auth-brand-inner">
-        <a className="auth-logo" href="login.html">BookHub</a>
+        <a className="auth-logo" href="/">BookHub</a>
 
         <div className="auth-hero">
           <h1>Registre os livros que você já leu.</h1>
@@ -69,7 +69,7 @@ export default function Cadastro() {
       <div className="auth-form-wrap">
         <h2>Cadastro</h2>
         <p className="auth-sub">
-          Já possui conta? <a href="login.html">Faça login</a>
+          Já possui conta? <a href="/">Faça login</a>
         </p>
 
         <div className="auth-message auth-message--error" data-auth-message hidden role="alert"></div>
