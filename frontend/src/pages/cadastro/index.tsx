@@ -1,9 +1,60 @@
+import { useState } from "react"
+import { Bounce, ToastContainer, toast } from 'react-toastify';
+
+
+interface UserDataInterface {
+  name: string
+  email: string
+  senha: string
+  senhaConfirmação: string
+}
+
+export default function Cadastro() {
+
+
+  const [userData, setUserData] = useState<UserDataInterface>({
+    name: "",
+    email: "",
+    senha: "",
+    senhaConfirmação: ""
+  })
+
+  const handlerCreateUser = () => {
+
+    if (userData.email.length <= 0 || userData.name.length <= 0 || userData.senha.length <= 0 || userData.senhaConfirmação.length <= 0) {
+      toast.warn('Preencha todos os campos antes de se cadastrar', {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: false,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+    }
 
 
 
-export default function Cadastro(){
-    return( <div className="auth-shell">
+  }
+
+
+  return (<div className="auth-shell">
+
     <aside className="auth-brand" aria-label="BookHub">
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
       <div className="auth-brand-inner">
         <a className="auth-logo" href="login.html">BookHub</a>
 
@@ -34,6 +85,12 @@ export default function Cadastro(){
                 autoComplete="name"
                 placeholder="Seu nome"
                 minLength={2}
+                onChange={(e) =>
+                  setUserData((prev) => ({
+                    ...prev,
+                    name: e.target.value
+                  }))
+                }
                 required
               />
             </div>
@@ -49,6 +106,12 @@ export default function Cadastro(){
                 autoComplete="email"
                 placeholder="seu@email.com"
                 required
+                onChange={(e) =>
+                  setUserData((prev) => ({
+                    ...prev,
+                    email: e.target.value
+                  }))
+                }
               />
             </div>
           </div>
@@ -64,6 +127,12 @@ export default function Cadastro(){
                 placeholder="********"
                 minLength={8}
                 required
+                onChange={(e) =>
+                  setUserData((prev) => ({
+                    ...prev,
+                    senha: e.target.value
+                  }))
+                }
               />
               <button
                 type="button"
@@ -72,10 +141,16 @@ export default function Cadastro(){
                 aria-controls="password"
                 aria-label="Mostrar senha"
                 aria-pressed="false"
+                onChange={(e) =>
+                  setUserData((prev) => ({
+                    ...prev,
+                    senhaConfirmação: e.target.value
+                  }))
+                }
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
                 </svg>
               </button>
             </div>
@@ -96,7 +171,7 @@ export default function Cadastro(){
             </div>
           </div>
 
-          <button type="submit" className="auth-submit">Cadastrar</button>
+          <button type="submit" onClick={handlerCreateUser} className="auth-submit">Cadastrar</button>
         </form>
       </div>
     </main>
