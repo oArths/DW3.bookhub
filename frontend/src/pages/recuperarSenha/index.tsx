@@ -3,7 +3,7 @@ export default function RecuperarSenha(){
           <div className="auth-shell">
     <aside className="auth-brand" aria-label="BookHub">
       <div className="auth-brand-inner">
-        <a className="auth-logo" href="login.html">BookHub</a>
+        <a className="auth-logo" href="/">BookHub</a>
 
         <div className="auth-hero">
           <h1>Registre os livros que você já leu.</h1>
