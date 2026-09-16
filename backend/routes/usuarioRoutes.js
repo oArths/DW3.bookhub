@@ -33,6 +33,41 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ erro: 'email e password são obrigatórios.' });
+    }
+
+    const usuario = await Usuario.findOne({ email });
+    if (!usuario) {
+      return res.status(404).json({
+        erro: 'Email ou senha incorretos.'
+      });
+    }
+    const senhaCorreta = await bcrypt.compare(
+      password,
+      usuario.passwordHash
+    );
+
+    if (senhaCorreta) {
+      // Removemos o hash da resposta por segurança, mesmo sendo
+      // um hash — não há motivo para expor isso na API.
+      const { passwordHash: _omitido, ...usuarioSemSenha } = usuario.toObject();
+
+      res.status(201).json(usuarioSemSenha);
+    } else {
+      return res.status(404).json({
+        erro: 'Email ou Senha Incorretos.'
+      });
+    }
+  } catch (erro) {
+    res.status(500).json({ erro: erro.message });
+  }
+});
+
 // GET /usuarios/:id -> busca um usuário pelo id
 router.get('/:id', async (req, res) => {
   try {

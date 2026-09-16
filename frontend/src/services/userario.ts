@@ -1,25 +1,36 @@
+import axios from "axios";
 import { api } from "./api";
-interface UserInput {
-  name: string;
+export interface UserInputCreate {
+  username: string;
   email: string;
-  senha: string;
+  password: string;
   bio: string | null;
 }
+export type UserInputLogin = Pick<UserInputCreate, "email" | "password">;
 
-interface UserInputResponse{
-    _id: string
-    username: string
-    email: string
-    bio: string
-    avatarURL: string
-    createdAt: string
+export interface UserInputResponse {
+  _id: string;
+  username: string;
+  email: string;
+  bio: string;
+  avatarURL: string;
+  createdAt: string;
+}
+export interface ApiError {
+  erro: string;
+}
 
+async function createUser(
+  user: UserInputCreate,
+): Promise<UserInputResponse | string> {
+  const resposta = await api.post<UserInputResponse>("/usuarios", user);
+  return resposta.data;
 }
-async function createUser() {
-  try {
-    const resposta = await api.post("/usuarios");
-    console.log(resposta.data);
-  } catch (erro) {
-    console.error("Erro ao buscar dados:", erro);
-  }
+async function loginUser(
+  user: UserInputLogin,
+): Promise<UserInputResponse | string> {
+  const resposta = await api.post<UserInputResponse>("/usuarios/login", user);
+  return resposta.data;
 }
+
+export { createUser, loginUser };

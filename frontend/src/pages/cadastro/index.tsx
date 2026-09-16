@@ -1,6 +1,11 @@
 import { useState } from "react"
-import { Bounce, ToastContainer, toast } from 'react-toastify';
-
+import { Bounce, ToastContainer } from 'react-toastify';
+import { ApiError, UserInputCreate, UserInputResponse } from "../../services/userario";
+import { createUser } from "../../services/userario";
+import axios from "axios";
+import { toastWarn } from "../../utils/toast";
+import { useSession } from "../../store/session";
+import { useNavigate } from "react-router-dom";
 
 interface UserDataInterface {
   name: string
@@ -11,7 +16,8 @@ interface UserDataInterface {
 
 export default function Cadastro() {
 
-
+  const setToken = useSession((s) => s.setToken);
+  const navigate = useNavigate();
   const [userData, setUserData] = useState<UserDataInterface>({
     name: "",
     email: "",
@@ -19,25 +25,54 @@ export default function Cadastro() {
     senhaConfirmação: ""
   })
 
-  const handlerCreateUser = () => {
 
+
+  const handlerCreateUser = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.table(userData)
     if (userData.email.length <= 0 || userData.name.length <= 0 || userData.senha.length <= 0 || userData.senhaConfirmação.length <= 0) {
-      toast.warn('Preencha todos os campos antes de se cadastrar', {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: false,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toastWarn('Preencha todos os campos antes de se cadastrar')
+      return;
     }
 
+    if (userData.senha.length < 8 || userData.senhaConfirmação.length < 8) {
+      toastWarn('As senhas deve ter no minimo 8 caracteres');
+      return;
+    }
+    if (userData.senha !== userData.senhaConfirmação) {
+      toastWarn('As senhas deve ser iguais');
+      return;
+    }
 
+    try {
+
+      const inputUser: UserInputCreate = {
+        username: userData.name,
+        email: userData.email,
+        password: userData.senha,
+        bio: null
+
+      }
+
+      const response: UserInputResponse | string = await createUser(inputUser)
+
+      if (typeof response !== "string") {
+        setToken(response._id)
+        navigate("/home");
+      }
+
+    } catch (error) {
+
+      if (axios.isAxiosError<ApiError>(error)) {
+        const mensagem = error.response?.data.erro;
+        if (typeof mensagem == "string") {
+          toastWarn(mensagem)
+        }
+      }
+    }
 
   }
+  const [showPassword, setShowPassword] = useState(false);
 
 
   return (<div className="auth-shell">
@@ -74,7 +109,7 @@ export default function Cadastro() {
 
         <div className="auth-message auth-message--error" data-auth-message hidden role="alert"></div>
 
-        <form id="register-form" >
+        <form onSubmit={handlerCreateUser} >
           <div className="auth-field">
             <label >Nome</label>
             <div className="auth-input-wrap">
@@ -120,12 +155,12 @@ export default function Cadastro() {
             <label >Senha</label>
             <div className="auth-input-wrap">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
                 autoComplete="new-password"
                 placeholder="********"
-                minLength={8}
+
                 required
                 onChange={(e) =>
                   setUserData((prev) => ({
@@ -134,21 +169,16 @@ export default function Cadastro() {
                   }))
                 }
               />
+
               <button
                 type="button"
                 className="auth-toggle-pw"
-                data-toggle-password
+                onClick={() => setShowPassword(!showPassword)}
                 aria-controls="password"
-                aria-label="Mostrar senha"
-                aria-pressed="false"
-                onChange={(e) =>
-                  setUserData((prev) => ({
-                    ...prev,
-                    senhaConfirmação: e.target.value
-                  }))
-                }
+                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                aria-pressed={showPassword}
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                   <circle cx="12" cy="12" r="3" />
                 </svg>
@@ -160,20 +190,40 @@ export default function Cadastro() {
             <label >Confirmação de senha</label>
             <div className="auth-input-wrap">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="passwordConfirm"
                 name="passwordConfirm"
                 autoComplete="new-password"
                 placeholder="********"
-                minLength={8}
                 required
+                onChange={(e) =>
+                  setUserData((prev) => ({
+                    ...prev,
+                    senhaConfirmação: e.target.value
+                  }))
+                }
               />
+              <button
+                type="button"
+                className="auth-toggle-pw"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-controls="password"
+                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                aria-pressed={showPassword}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
             </div>
+
           </div>
 
-          <button type="submit" onClick={handlerCreateUser} className="auth-submit">Cadastrar</button>
+          <button type="submit" className="auth-submit">Cadastrar</button>
         </form>
       </div>
     </main>
   </div>)
 }
+
