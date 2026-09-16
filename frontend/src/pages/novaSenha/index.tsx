@@ -1,18 +1,69 @@
-import { FormEvent } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { toastWarn } from "../../utils/toast";
+import { ApiError, UserCodeResetPassword, UserInputResponse } from "../../services/userario";
+import { resetPassword } from "../../services/userario";
+import { useSession } from "../../store/session";
+import axios from "axios";
 
-type RecoveryState = {
-	email?: string;
-};
+interface UserDataInterface {
+	senha: string
+	senhaConfirmação: string
+}
 
 export default function NovaSenha() {
 	const navigate = useNavigate();
-	const location = useLocation();
-	const email = (location.state as RecoveryState | null)?.email ?? "";
+	const setToken = useSession((s) => s.setToken);
+	const [searchParams] = useSearchParams();
+	const [loading, setLoading] = useState<boolean>(false)
 
-	function handleSubmit(event: FormEvent<HTMLFormElement>) {
-		event.preventDefault();
-		navigate("/");
+	const email = searchParams.get('email');
+	const code = searchParams.get('code');
+	const [userData, setUserData] = useState<UserDataInterface>({
+		senha: "",
+		senhaConfirmação: ""
+	})
+
+
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		setLoading(true)
+		e.preventDefault();
+		console.log()
+		if (email == null || code == null) {
+			toastWarn('Sem email ou codigo regsitardo')
+			return;
+		}
+
+		if (userData.senha.length <= 0 || userData.senhaConfirmação.length <= 0) {
+			toastWarn('Preencha o codigo para criar a nova senha')
+			return;
+		}
+
+		try {
+
+			const inputUser: UserCodeResetPassword = {
+				email: email,
+				password: userData.senha,
+				code: code
+			}
+
+			const response: UserInputResponse | ApiError = await resetPassword(inputUser)
+
+			if ('_id' in response) {
+				setToken(response._id)
+				navigate("/home");
+			}
+		} catch (error) {
+
+			if (axios.isAxiosError<ApiError>(error)) {
+				const mensagem = error.response?.data.erro;
+				if (typeof mensagem == "string") {
+					toastWarn(mensagem)
+				}
+			}
+		}
+		setLoading(true)
+
 	}
 
 	return (
@@ -39,14 +90,22 @@ export default function NovaSenha() {
 						<div className="auth-field">
 							<label htmlFor="password">Nova senha</label>
 							<div className="auth-input-wrap">
-								<input type="password" id="password" name="password" minLength={6} autoComplete="new-password" required />
+								<input type="password" id="password" name="password" autoComplete="new-password" onChange={(e) =>
+									setUserData((prev) => ({
+										...prev,
+										senha: e.target.value
+									}))} />
 							</div>
 						</div>
 
 						<div className="auth-field">
 							<label htmlFor="password-confirmation">Confirme a nova senha</label>
 							<div className="auth-input-wrap">
-								<input type="password" id="password-confirmation" name="password-confirmation" minLength={6} autoComplete="new-password" required />
+								<input type="password" id="password-confirmation" name="password-confirmation" autoComplete="new-password" onChange={(e) =>
+									setUserData((prev) => ({
+										...prev,
+										senhaConfirmação: e.target.value
+									}))} />
 							</div>
 						</div>
 

@@ -5,6 +5,7 @@ import { loginUser } from "../../services/userario";
 import axios from "axios";
 import { useSession } from "../../store/session";
 import { useNavigate } from "react-router-dom";
+import { Bounce, ToastContainer } from "react-toastify";
 
 interface UserDataInterface {
     email: string
@@ -27,13 +28,14 @@ export default function Login() {
         console.table(userData)
         if (userData.email.length <= 0 || userData.senha.length <= 0) {
             toastWarn('Preencha todos os campos antes de se cadastrar')
+
             return;
         }
         if (userData.senha.length < 8) {
             toastWarn('As senhas deve ter no minimo 8 caracteres');
+
             return;
         }
-
         try {
 
             const inputUser: UserInputLogin = {
@@ -60,6 +62,18 @@ export default function Login() {
     }
     return (<div className="auth-shell">
         <aside className="auth-brand" aria-label="BookHub">
+            <ToastContainer
+                position="top-center"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick={false}
+                rtl={false}
+                pauseOnFocusLoss
+                pauseOnHover
+                theme="light"
+                transition={Bounce}
+            />
 
             <div className="auth-brand-inner">
                 <a className="auth-logo" href="/">
@@ -103,7 +117,6 @@ export default function Login() {
                                 id="email"
                                 name="email"
                                 placeholder="voce@email.com"
-                                required
                                 onChange={(e) =>
                                     setUserData((prev) => ({
                                         ...prev,
@@ -131,7 +144,6 @@ export default function Login() {
                                         senha: e.target.value
                                     }))
                                 }
-                                required
                             />
 
                             <button

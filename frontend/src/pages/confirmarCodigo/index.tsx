@@ -1,28 +1,80 @@
-import { FormEvent } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Bounce, ToastContainer } from "react-toastify";
+import { toastWarn } from "../../utils/toast";
+import { ApiError, ApiResponse, UserCodeLogin, verifyCode } from "../../services/userario";
+import axios from "axios";
+import { useSearchParams } from 'react-router-dom';
 
-type RecoveryState = {
-  email?: string;
-};
+interface UserDataInterface {
+  code: string
+}
 
 export default function ConfirmarCodigo() {
   const navigate = useNavigate();
   const location = useLocation();
-  const email = (location.state as RecoveryState | null)?.email ?? "";
+  const [loading, setLoading] = useState<boolean>(false)
+  const [searchParams] = useSearchParams();
+  const email = searchParams.get('email');
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const code = String(formData.get("code") ?? "").trim();
+  const [userData, setUserData] = useState<UserDataInterface>({
+    code: "",
+  })
 
-    if (!code) return;
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setLoading(true)
+    e.preventDefault();
+    console.log()
+    if (email == null) {
+      toastWarn('Sem email regsitardo')
+      return;
+    }
 
-    navigate("/nova-senha", { state: { email } });
+    if (userData.code.length <= 0) {
+      toastWarn('Preencha o codigo para criar a nova senha')
+      return;
+    }
+
+    try {
+
+      const inputUser: UserCodeLogin = {
+        email: email,
+        code: userData.code
+      }
+
+      const response: ApiResponse | ApiError = await verifyCode(inputUser)
+
+      if ('mensagem' in response) {
+        navigate(`/nova-senha?email=${email}&code=${userData.code}`);
+      }
+    } catch (error) {
+
+      if (axios.isAxiosError<ApiError>(error)) {
+        const mensagem = error.response?.data.erro;
+        if (typeof mensagem == "string") {
+          toastWarn(mensagem)
+        }
+      }
+    }
+    setLoading(true)
+
   }
 
   return (
     <div className="auth-shell">
       <aside className="auth-brand" aria-label="BookHub">
+        <ToastContainer
+          position="top-center"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          pauseOnHover
+          theme="light"
+          transition={Bounce}
+        />
         <div className="auth-brand-inner">
           <a className="auth-logo" href="/">BookHub</a>
 
@@ -37,14 +89,19 @@ export default function ConfirmarCodigo() {
         <div className="auth-form-wrap auth-form-wrap--compact">
           <h2>Confirme o código</h2>
           <p className="auth-sub">
-            Código simulado para <strong>{email || "seu e-mail"}</strong>. Nenhuma mensagem foi enviada.
+            Código enviado para <strong>{email || "seu e-mail"}</strong>.
           </p>
 
           <form onSubmit={handleSubmit}>
             <div className="auth-field">
               <label htmlFor="code">Código de confirmação</label>
               <div className="auth-input-wrap">
-                <input type="text" id="code" name="code" inputMode="numeric" placeholder="000000" required />
+                <input type="text" id="code" name="code" inputMode="numeric" placeholder="000000" onChange={(e) =>
+                  setUserData((prev) => ({
+                    ...prev,
+                    code: e.target.value
+                  }))
+                } />
               </div>
             </div>
 

@@ -1,8 +1,11 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const Usuario = require('../models/Usuario');
-
+const nodemailer = require('nodemailer');
+const transporter = require("../config/email");
+const crypto = require("crypto");
 const router = express.Router();
+// const JWT_SECRET = process.env.JWT_SECRET
 
 // POST /usuarios -> cria um novo usuário (cadastro)
 router.post('/', async (req, res) => {
@@ -68,6 +71,146 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ erro: 'email é obrigatório.' });
+    }
+
+    const usuario = await Usuario.findOne({ email });
+
+    if (!usuario) {
+      return res.status(404).json({
+        erro: 'Email não encontrado.'
+      });
+    }
+    const code = crypto.randomInt(100000, 1000000).toString();
+
+    usuario.resetPasswordCode = code;
+
+    usuario.resetPasswordExpires = new Date(
+      Date.now() + 60 * 60 * 1000
+    );
+
+    await usuario.save();
+
+
+    await transporter.sendMail({
+      from: `"BookHub" <${process.env.EMAIL_USER}>`,
+      to: usuario.email,
+      subject: "Código para redefinir sua senha",
+
+      html: `
+        <h2>Recuperação de senha</h2>
+
+        <p>Seu código para redefinir a senha é:</p>
+
+        <h1>${code}</h1>
+
+        <p>Esse código expira em 10 minutos.</p>
+
+        <p>Se você não solicitou a recuperação de senha,
+        ignore este e-mail.</p>
+      `,
+    });
+
+
+    return res.status(200).json({
+      mensagem: "Código enviado para o seu email.",
+    });
+
+  } catch (erro) {
+    res.status(500).json({ erro: erro.message });
+  }
+});
+
+router.post("/verify-reset-code", async (req, res) => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      return res.status(400).json({
+        erro: "Email e código são obrigatórios.",
+      });
+    }
+
+    const usuario = await Usuario.findOne({
+      email,
+      resetPasswordCode: code,
+      resetPasswordExpires: {
+        $gt: new Date(),
+      },
+    });
+
+    if (!usuario) {
+      return res.status(400).json({
+        erro: "Código inválido ou expirado.",
+      });
+    }
+
+    return res.status(200).json({
+      mensagem: "Código válido.",
+    });
+
+  } catch (erro) {
+    console.error(erro);
+
+    return res.status(500).json({
+      erro: "Erro ao verificar código.",
+    });
+  }
+});
+
+router.post("/reset-password", async (req, res) => {
+  try {
+    const {
+      email,
+      code,
+      password,
+    } = req.body;
+
+    if (!email || !code || !password) {
+      return res.status(400).json({
+        erro: "Email, código e senha são obrigatórios.",
+      });
+    }
+
+    const usuario = await Usuario.findOne({
+      email,
+      resetPasswordCode: code,
+      resetPasswordExpires: {
+        $gt: new Date(),
+      },
+    });
+
+    if (!usuario) {
+      return res.status(400).json({
+        erro: "Código inválido ou expirado.",
+      });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    usuario.passwordHash = passwordHash;
+
+    usuario.resetPasswordCode = undefined;
+    usuario.resetPasswordExpires = undefined;
+
+    await usuario.save();
+
+    const { passwordHash: _omitido, ...usuarioSemSenha } = usuario.toObject();
+
+    res.status(201).json(usuarioSemSenha);
+  } catch (erro) {
+    console.error(erro);
+
+    return res.status(500).json({
+      erro: "Erro ao alterar senha.",
+    });
+  }
+});
 // GET /usuarios/:id -> busca um usuário pelo id
 router.get('/:id', async (req, res) => {
   try {
