@@ -1,8 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const Usuario = require('../models/Usuario');
-const nodemailer = require('nodemailer');
-const transporter = require("../config/email");
+const resend = require("../config/resend");
 const crypto = require("crypto");
 const router = express.Router();
 // const JWT_SECRET = process.env.JWT_SECRET
@@ -97,8 +96,8 @@ router.post('/forgot-password', async (req, res) => {
     await usuario.save();
 
 
-    await transporter.sendMail({
-      from: `"BookHub" <${process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || "BookHub <onboarding@resend.dev>",
       to: usuario.email,
       subject: "Código para redefinir sua senha",
 
