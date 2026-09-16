@@ -16,7 +16,7 @@
   function getToken() {
     try {
       return localStorage.getItem(cfg.tokenStorageKey);
-    } catch (e) {
+    } catch {
       return null;
     }
   }
@@ -34,7 +34,9 @@
     try {
       localStorage.removeItem(cfg.tokenStorageKey);
       localStorage.removeItem(cfg.refreshTokenStorageKey);
-    } catch (e) {}
+    } catch {
+      return;
+    }
   }
 
   /**
@@ -108,7 +110,7 @@
     if (!text) return null;
     try {
       return JSON.parse(text);
-    } catch (e) {
+    } catch {
       return null;
     }
   }

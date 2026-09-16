@@ -1,16 +1,69 @@
-# React + Vite
+# BookHub Front-end
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Front-end do BookHub utilizando React, Vite e Tailwind CSS.
 
-Currently, two official plugins are available:
+## Requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 18 ou superior
+- npm
+- Backend do BookHub disponível em `http://localhost:3000` para testar a integração
 
-## React Compiler
+## Instalação
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Na pasta `frontend`, instale as dependências:
 
-## Expanding the ESLint configuration
+```bash
+npm install
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Crie o arquivo `.env` a partir do exemplo:
+
+```bash
+cp .env.example .env
+```
+
+A variável `VITE_API_URL` define o endereço do backend usado pelo proxy de desenvolvimento:
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+## Scripts
+
+Iniciar o servidor de desenvolvimento:
+
+```bash
+npm run dev
+```
+
+O front-end ficará disponível em `http://localhost:5173`.
+
+Gerar a versão de produção:
+
+```bash
+npm run build
+```
+
+Executar a pré-visualização do build:
+
+```bash
+npm run preview
+```
+
+Verificar o código com ESLint:
+
+```bash
+npm run lint
+```
+
+## Estrutura principal
+
+```text
+src/                    Aplicação React
+public/bookhub/         Páginas estáticas e recursos de autenticação
+public/bookhub/css/     Estilos das telas públicas
+public/bookhub/js/      Configuração e comportamento de autenticação
+vite.config.js          Configuração do Vite e proxy da API
+```
+
+O arquivo `.env` contém configurações locais e não deve ser enviado ao repositório. O arquivo `.env.example` é o modelo versionado para os demais ambientes.
