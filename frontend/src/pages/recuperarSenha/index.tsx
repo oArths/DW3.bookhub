@@ -23,6 +23,7 @@ export default function RecuperarSenha() {
     e.preventDefault();
     if (userData.email.length <= 0) {
       toastWarn('Preencha todos os campos antes de se cadastrar')
+      setLoading(false)
       return;
     }
     try {
@@ -45,7 +46,7 @@ export default function RecuperarSenha() {
         }
       }
     }
-    setLoading(true)
+    setLoading(false)
 
   }
 
@@ -93,6 +94,7 @@ export default function RecuperarSenha() {
                     email: e.target.value
                   }))
                 } />
+
               </div>
             </div>
 

@@ -1,9 +1,31 @@
 import { create } from "zustand";
-interface sessionInterface {
-  token: string | null;
-  setToken: (token: string) => void;
+interface User {
+  _id: string;
+  username: string;
+  email: string;
+  bio: string;
+  avatarURL: string;
+  createdAt: string;
 }
+interface sessionInterface {
+  user: User | null;
+  token: string | null;
+  setUser: (user: User) => void;
+  setToken: (token: string) => void;
+  logout: () => void;
+}
+
 export const useSession = create<sessionInterface>((set) => ({
+  user: null,
   token: null,
-  setToken: (newToken) => set({ token: newToken }),
+
+  setUser: (user) => set({ user }),
+
+  setToken: (token) => set({ token }),
+
+  logout: () =>
+    set({
+      user: null,
+      token: null,
+    }),
 }));

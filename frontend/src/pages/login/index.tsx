@@ -19,7 +19,8 @@ export default function Login() {
         senha: "",
     })
 
-    const setToken = useSession((s) => s.setToken);
+    const setToken = useSession((s) => s.setToken)
+    const setUser = useSession((s) => s.setUser)
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
 
@@ -47,6 +48,7 @@ export default function Login() {
 
             if (typeof response !== "string") {
                 setToken(response._id)
+                setUser(response)
                 navigate("/home");
             }
         } catch (error) {

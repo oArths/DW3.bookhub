@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 import { toastWarn } from "../../utils/toast";
-import { ApiError, ApiResponse, UserCodeLogin, verifyCode } from "../../services/userario";
+import { ApiError, ApiResponse, UserCodeLogin, getCode } from "../../services/userario";
 import axios from "axios";
 import { useSearchParams } from 'react-router-dom';
 
@@ -12,7 +12,6 @@ interface UserDataInterface {
 
 export default function ConfirmarCodigo() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [loading, setLoading] = useState<boolean>(false)
   const [searchParams] = useSearchParams();
   const email = searchParams.get('email');
@@ -24,14 +23,15 @@ export default function ConfirmarCodigo() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setLoading(true)
     e.preventDefault();
-    console.log()
     if (email == null) {
-      toastWarn('Sem email regsitardo')
+      toastWarn('Sem email registrado')
+      setLoading(false)
       return;
     }
 
     if (userData.code.length <= 0) {
       toastWarn('Preencha o codigo para criar a nova senha')
+      setLoading(false)
       return;
     }
 
@@ -42,7 +42,7 @@ export default function ConfirmarCodigo() {
         code: userData.code
       }
 
-      const response: ApiResponse | ApiError = await verifyCode(inputUser)
+      const response: ApiResponse | ApiError = await getCode(inputUser)
 
       if ('mensagem' in response) {
         navigate(`/nova-senha?email=${email}&code=${userData.code}`);
@@ -56,7 +56,7 @@ export default function ConfirmarCodigo() {
         }
       }
     }
-    setLoading(true)
+    setLoading(false)
 
   }
 
