@@ -6,7 +6,6 @@ import axios from "axios";
 import { useSession } from "../../store/session";
 import { useNavigate } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
-
 interface UserDataInterface {
     email: string
     senha: string
@@ -79,7 +78,7 @@ export default function Login() {
 
             <div className="auth-brand-inner">
                 <a className="auth-logo" href="/">
-                    <span className="auth-logo-mark" aria-hidden="true">📖</span>
+                    <span className="auth-logo-mark" aria-hidden="true"><img src="/logo.png" className="aspect-square w-[70%]" /></span>
                     BookHub
                 </a>
 

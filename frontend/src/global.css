@@ -323,14 +323,17 @@ body.auth-page {
   cursor: not-allowed;
 }
 
-.auth-resend {
-  margin-top: 1rem;
+.auth-resend-hint {
+  margin: 1rem 0 0;
   text-align: center;
+  color: var(--bh-muted);
+  font-size: 0.875rem;
 }
 
-.auth-resend-btn {
+.auth-resend-link {
   border: none;
   background: transparent;
+  padding: 0;
   color: var(--bh-purple);
   font: inherit;
   font-size: 0.875rem;
@@ -338,14 +341,19 @@ body.auth-page {
   cursor: pointer;
 }
 
-.auth-resend-btn:hover:not(:disabled) {
+.auth-resend-link:hover:not(:disabled) {
   color: var(--bh-purple-dark);
   text-decoration: underline;
 }
 
-.auth-resend-btn:disabled {
+.auth-resend-link:disabled {
   color: var(--bh-muted);
   cursor: not-allowed;
+}
+
+.auth-resend-wait {
+  color: var(--bh-muted);
+  font-weight: 600;
 }
 
 .auth-divider {

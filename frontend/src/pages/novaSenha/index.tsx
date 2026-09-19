@@ -100,8 +100,10 @@ export default function NovaSenha() {
 					transition={Bounce}
 				/>
 				<div className="auth-brand-inner">
-					<a className="auth-logo" href="/">BookHub</a>
-
+					<a className="auth-logo" href="/">
+						<span className="auth-logo-mark" aria-hidden="true"><img src="/logo.png" className="aspect-square w-[70%]" /></span>
+						BookHub
+					</a>
 					<div className="auth-hero">
 						<h1>Registre os livros que você já leu.</h1>
 						<p>Salve aqueles que você quer e compartilhe com seus amigos o que você achou bom.</p>
@@ -167,7 +169,7 @@ export default function NovaSenha() {
 							</div>
 						</div>
 
-						<button type="submit" className="auth-submit">Salvar nova senha</button>
+						<button type="submit" className="auth-submit" disabled={loading}>Salvar nova senha</button>
 					</form>
 				</div>
 			</main>

@@ -42,48 +42,7 @@ body.auth-page {
   width: 100%;
 }
 
-/* Painel esquerdo */
-.auth-brand {
-  position: relative;
-  padding: clamp(1.5rem, 2.5vw, 2.5rem) clamp(1.5rem, 3vw, 3rem);
-  background: linear-gradient(145deg, var(--bh-purple) 0%, var(--bh-purple-dark) 45%, var(--bh-purple-deep) 100%);
-  color: var(--bh-white);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
 
-.auth-brand::before,
-.auth-brand::after {
-  content: "";
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-  pointer-events: none;
-}
-
-.auth-brand::before {
-  width: min(420px, 55vw);
-  height: min(420px, 55vw);
-  top: -8%;
-  right: -12%;
-}
-
-.auth-brand::after {
-  width: min(280px, 40vw);
-  height: min(280px, 40vw);
-  bottom: 18%;
-  left: -8%;
-}
-
-.auth-brand-inner {
-  position: relative;
-  z-index: 1;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
 
 .auth-logo {
   display: inline-flex;

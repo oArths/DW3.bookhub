@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toastWarn } from "../../utils/toast";
 import { ApiError, ApiResponse, UserInputForgot, verifyCode } from "../../services/userario";
 import axios from "axios";
 import { Bounce, ToastContainer } from "react-toastify";
-import { startResendTimer, useResendTimer } from "../../utils/resendTimer";
+import { useResendTimer } from "../../store/resendTimer";
 
 
 interface UserDataInterface {
@@ -18,7 +18,20 @@ export default function RecuperarSenha() {
     email: "",
   })
   const [loading, setLoading] = useState<boolean>(false)
-  const { secondsLeft, canResend } = useResendTimer(userData.email);
+  const { secondsLeft, start, sync } = useResendTimer();
+  const canResend = secondsLeft <= 0;
+
+  useEffect(() => {
+    sync(userData.email);
+
+    const resync = () => sync(userData.email);
+    window.addEventListener("focus", resync);
+    document.addEventListener("visibilitychange", resync);
+    return () => {
+      window.removeEventListener("focus", resync);
+      document.removeEventListener("visibilitychange", resync);
+    };
+  }, [userData.email, sync]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setLoading(true)
@@ -44,7 +57,7 @@ export default function RecuperarSenha() {
       const response: ApiResponse | ApiError = await verifyCode(inputUser)
 
       if ('mensagem' in response) {
-        startResendTimer(userData.email);
+        start(userData.email);
         navigate(`/confirmar-codigo?email=${userData.email}`);
       }
     } catch (error) {
@@ -76,8 +89,10 @@ export default function RecuperarSenha() {
           transition={Bounce}
         />
         <div className="auth-brand-inner">
-          <a className="auth-logo" href="/">BookHub</a>
-
+          <a className="auth-logo" href="/">
+            <span className="auth-logo-mark" aria-hidden="true"><img src="/logo.png" className="aspect-square w-[70%]" /></span>
+            BookHub
+          </a>
           <div className="auth-hero">
             <h1>Registre os livros que você já leu.</h1>
             <p>Salve aqueles que você quer e compartilhe com seus amigos o que você achou bom.</p>

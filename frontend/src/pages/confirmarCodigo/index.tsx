@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 import { toastSuccess, toastWarn } from "../../utils/toast";
 import { ApiError, ApiResponse, UserCodeLogin, UserInputForgot, getCode, verifyCode } from "../../services/userario";
 import axios from "axios";
 import { useSearchParams } from 'react-router-dom';
-import { useResendTimer } from "../../utils/resendTimer";
+import { useResendTimer } from "../../store/resendTimer";
 
 interface UserDataInterface {
   code: string
@@ -24,7 +24,20 @@ export default function ConfirmarCodigo() {
   const [searchParams] = useSearchParams();
   const email = searchParams.get('email');
 
-  const { secondsLeft, canResend, restart } = useResendTimer(email ?? "");
+  const { secondsLeft, start, sync } = useResendTimer();
+  const canResend = secondsLeft <= 0;
+
+  useEffect(() => {
+    sync(email ?? "");
+
+    const resync = () => sync(email ?? "");
+    window.addEventListener("focus", resync);
+    document.addEventListener("visibilitychange", resync);
+    return () => {
+      window.removeEventListener("focus", resync);
+      document.removeEventListener("visibilitychange", resync);
+    };
+  }, [email, sync]);
 
   const [userData, setUserData] = useState<UserDataInterface>({
     code: "",
@@ -43,7 +56,7 @@ export default function ConfirmarCodigo() {
       const response: ApiResponse | ApiError = await verifyCode(inputUser)
 
       if ('mensagem' in response) {
-        restart();
+        start(email);
         toastSuccess('Novo código enviado para o seu e-mail.');
       }
     } catch (error) {
@@ -54,7 +67,7 @@ export default function ConfirmarCodigo() {
         }
         const segundos = error.response?.data.segundos;
         if (typeof segundos == "number") {
-          restart(segundos)
+          start(email, segundos)
         }
       }
     }
@@ -117,8 +130,10 @@ export default function ConfirmarCodigo() {
           transition={Bounce}
         />
         <div className="auth-brand-inner">
-          <a className="auth-logo" href="/">BookHub</a>
-
+          <a className="auth-logo" href="/">
+            <span className="auth-logo-mark" aria-hidden="true"><img src="/logo.png" className="aspect-square w-[70%]" /></span>
+            BookHub
+          </a>
           <div className="auth-hero">
             <h1>Registre os livros que você já leu.</h1>
             <p>Salve aqueles que você quer e compartilhe com seus amigos o que você achou bom.</p>
@@ -146,27 +161,28 @@ export default function ConfirmarCodigo() {
               </div>
             </div>
 
-            <button type="submit" className="auth-submit">Confirmar código</button>
-            <div>
-              <span className="flex flex-row items-start gap-1 mt-5">
-                <p>O código não chegou?</p>
-                 <p className="text-blue-500 font-medium cursor-pointer">faça o reenvio</p> 
-              </span>
-            </div>
-          </form>
-
-          <div className="auth-resend">
-            <button
-              type="button"
-              className="auth-resend-btn"
-              onClick={handleResend}
-              disabled={!canResend || resending}
-            >
-              {canResend
-                ? (resending ? "Enviando..." : "Reenviar código")
-                : `Reenviar código em ${formatTimer(secondsLeft)}`}
+            <button type="submit" className="auth-submit" disabled={loading}>
+              {loading ? "Confirmando..." : "Confirmar código"}
             </button>
-          </div>
+
+            <p className="auth-resend-hint">
+              O código não chegou?{" "}
+              {canResend ? (
+                <button
+                  type="button"
+                  className="auth-resend-link"
+                  onClick={handleResend}
+                  disabled={resending}
+                >
+                  {resending ? "Enviando..." : "Faça o reenvio"}
+                </button>
+              ) : (
+                <span className="auth-resend-wait">
+                  Reenviar em {formatTimer(secondsLeft)}
+                </span>
+              )}
+            </p>
+          </form>
         </div>
       </main>
     </div>
