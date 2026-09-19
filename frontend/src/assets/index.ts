@@ -1,0 +1,1 @@
+export  {default as UserDeafult} from "./images/user_default.webp"
