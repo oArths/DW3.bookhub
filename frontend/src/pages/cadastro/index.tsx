@@ -17,6 +17,8 @@ interface UserDataInterface {
 export default function Cadastro() {
 
   const setToken = useSession((s) => s.setToken);
+  const setUser = useSession((s) => s.setUser)
+
   const navigate = useNavigate();
   const [userData, setUserData] = useState<UserDataInterface>({
     name: "",
@@ -24,8 +26,6 @@ export default function Cadastro() {
     senha: "",
     senhaConfirmação: ""
   })
-
-
 
   const handlerCreateUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -58,6 +58,8 @@ export default function Cadastro() {
 
       if (typeof response !== "string") {
         setToken(response._id)
+        setUser(response)
+
         navigate("/home");
       }
 
@@ -111,7 +113,7 @@ export default function Cadastro() {
 
         <form onSubmit={handlerCreateUser} >
           <div className="auth-field">
-            <label >Nome</label>
+            <label >Username</label>
             <div className="auth-input-wrap">
               <input
                 type="text"
