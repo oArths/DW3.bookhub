@@ -1,24 +1,65 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
-import { toastWarn } from "../../utils/toast";
-import { ApiError, ApiResponse, UserCodeLogin, getCode } from "../../services/userario";
+import { toastSuccess, toastWarn } from "../../utils/toast";
+import { ApiError, ApiResponse, UserCodeLogin, UserInputForgot, getCode, verifyCode } from "../../services/userario";
 import axios from "axios";
 import { useSearchParams } from 'react-router-dom';
+import { useResendTimer } from "../../utils/resendTimer";
 
 interface UserDataInterface {
   code: string
 }
 
+function formatTimer(seconds: number): string {
+  const min = Math.floor(seconds / 60);
+  const sec = seconds % 60;
+  return `${min}:${sec.toString().padStart(2, "0")}`;
+}
+
 export default function ConfirmarCodigo() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false)
+  const [resending, setResending] = useState<boolean>(false)
   const [searchParams] = useSearchParams();
   const email = searchParams.get('email');
+
+  const { secondsLeft, canResend, restart } = useResendTimer(email ?? "");
 
   const [userData, setUserData] = useState<UserDataInterface>({
     code: "",
   })
+
+  const handleResend = async () => {
+    if (email == null || !canResend || resending) {
+      return;
+    }
+    setResending(true)
+    try {
+      const inputUser: UserInputForgot = {
+        email: email,
+      }
+
+      const response: ApiResponse | ApiError = await verifyCode(inputUser)
+
+      if ('mensagem' in response) {
+        restart();
+        toastSuccess('Novo código enviado para o seu e-mail.');
+      }
+    } catch (error) {
+      if (axios.isAxiosError<ApiError>(error)) {
+        const mensagem = error.response?.data.erro;
+        if (typeof mensagem == "string") {
+          toastWarn(mensagem)
+        }
+        const segundos = error.response?.data.segundos;
+        if (typeof segundos == "number") {
+          restart(segundos)
+        }
+      }
+    }
+    setResending(false)
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setLoading(true)
@@ -107,6 +148,19 @@ export default function ConfirmarCodigo() {
 
             <button type="submit" className="auth-submit">Confirmar código</button>
           </form>
+
+          <div className="auth-resend">
+            <button
+              type="button"
+              className="auth-resend-btn"
+              onClick={handleResend}
+              disabled={!canResend || resending}
+            >
+              {canResend
+                ? (resending ? "Enviando..." : "Reenviar código")
+                : `Reenviar código em ${formatTimer(secondsLeft)}`}
+            </button>
+          </div>
         </div>
       </main>
     </div>

@@ -4,6 +4,7 @@ import { toastWarn } from "../../utils/toast";
 import { ApiError, ApiResponse, UserInputForgot, verifyCode } from "../../services/userario";
 import axios from "axios";
 import { Bounce, ToastContainer } from "react-toastify";
+import { startResendTimer, useResendTimer } from "../../utils/resendTimer";
 
 
 interface UserDataInterface {
@@ -17,6 +18,7 @@ export default function RecuperarSenha() {
     email: "",
   })
   const [loading, setLoading] = useState<boolean>(false)
+  const { secondsLeft, canResend } = useResendTimer(userData.email);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setLoading(true)
@@ -26,6 +28,13 @@ export default function RecuperarSenha() {
       setLoading(false)
       return;
     }
+
+    if (!canResend) {
+      toastWarn(`Aguarde ${secondsLeft} segundo(s) antes de solicitar um novo código.`)
+      setLoading(false)
+      return;
+    }
+
     try {
 
       const inputUser: UserInputForgot = {
@@ -35,6 +44,7 @@ export default function RecuperarSenha() {
       const response: ApiResponse | ApiError = await verifyCode(inputUser)
 
       if ('mensagem' in response) {
+        startResendTimer(userData.email);
         navigate(`/confirmar-codigo?email=${userData.email}`);
       }
     } catch (error) {

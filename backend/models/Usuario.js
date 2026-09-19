@@ -9,6 +9,7 @@ const usuarioSchema = new mongoose.Schema({
   resetPasswordCode: { type: String, default: '' },
   resetPasswordToken: { type: String, default: '' },
   resetPasswordExpires: { type: Date, default: '' },
+  resetPasswordSentAt: { type: Date, default: null },
 }, {
   timestamps: true, // cria createdAt e updatedAt automaticamente
 });

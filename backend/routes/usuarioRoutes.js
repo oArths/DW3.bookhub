@@ -6,6 +6,10 @@ const crypto = require("crypto");
 const router = express.Router();
 // const JWT_SECRET = process.env.JWT_SECRET
 
+// Intervalo mínimo entre envios de código de recuperação por e-mail,
+// para evitar spam de requisições de reset de senha.
+const COOLDOWN_RESET_MS = 60 * 1000;
+
 // POST /usuarios -> cria um novo usuário (cadastro)
 router.post('/', async (req, res) => {
   try {
@@ -85,6 +89,24 @@ router.post('/forgot-password', async (req, res) => {
         erro: 'Email não encontrado.'
       });
     }
+
+    // Bloqueia pedidos seguidos para o mesmo e-mail: só permite um novo
+    // código por janela de 1 minuto, evitando spam de requisições.
+    const ultimoEnvio = usuario.resetPasswordSentAt
+      ? new Date(usuario.resetPasswordSentAt).getTime()
+      : 0;
+
+    const decorrido = Date.now() - ultimoEnvio;
+
+    if (ultimoEnvio > 0 && decorrido < COOLDOWN_RESET_MS) {
+      const segundos = Math.ceil((COOLDOWN_RESET_MS - decorrido) / 1000);
+
+      return res.status(429).json({
+        erro: `Aguarde ${segundos} segundo(s) antes de solicitar um novo código.`,
+        segundos,
+      });
+    }
+
     const code = crypto.randomInt(100000, 1000000).toString();
 
     usuario.resetPasswordCode = code;
@@ -92,6 +114,8 @@ router.post('/forgot-password', async (req, res) => {
     usuario.resetPasswordExpires = new Date(
       Date.now() + 60 * 60 * 1000
     );
+
+    usuario.resetPasswordSentAt = new Date();
 
     await usuario.save();
 

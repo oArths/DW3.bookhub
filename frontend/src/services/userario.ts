@@ -27,6 +27,7 @@ export interface UserInputResponse {
 }
 export interface ApiError {
   erro: string;
+  segundos?: number;
 }
 export interface ApiResponse {
   mensagem: string;

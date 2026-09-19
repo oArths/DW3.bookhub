@@ -15,3 +15,19 @@
       transition: Bounce,
     });
   }
+
+  export const toastSuccess = (msg: string) => {
+    toast.success(msg, {
+      position: "top-center",
+      toastId: 'sucesso',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      closeButton: false,
+      pauseOnHover: true,
+      draggable: false,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+  }

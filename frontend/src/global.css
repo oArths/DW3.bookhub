@@ -325,6 +325,31 @@ body.auth-page {
   cursor: not-allowed;
 }
 
+.auth-resend {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.auth-resend-btn {
+  border: none;
+  background: transparent;
+  color: var(--bh-purple);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-resend-btn:hover:not(:disabled) {
+  color: var(--bh-purple-dark);
+  text-decoration: underline;
+}
+
+.auth-resend-btn:disabled {
+  color: var(--bh-muted);
+  cursor: not-allowed;
+}
+
 .auth-divider {
   display: flex;
   align-items: center;
