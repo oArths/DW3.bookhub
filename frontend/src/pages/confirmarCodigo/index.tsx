@@ -106,6 +106,12 @@ export default function ConfirmarCodigo() {
             </div>
 
             <button type="submit" className="auth-submit">Confirmar código</button>
+            <div>
+              <span className="flex flex-row items-start gap-1 mt-5">
+                <p>O código não chegou?</p>
+                 <p className="text-blue-500 font-medium cursor-pointer">faça o reenvio</p> 
+              </span>
+            </div>
           </form>
         </div>
       </main>
