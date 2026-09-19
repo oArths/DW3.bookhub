@@ -97,22 +97,164 @@ router.post('/forgot-password', async (req, res) => {
 
 
     await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || "BookHub <onboarding@resend.dev>",
+      from:
+        process.env.RESEND_FROM_EMAIL ||
+        "BookHub <onboarding@resend.dev>",
+
       to: usuario.email,
-      subject: "Código para redefinir sua senha",
+
+      subject: "Seu código para redefinir a senha",
 
       html: `
-        <h2>Recuperação de senha</h2>
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Recuperação de senha - BookHub</title>
+      </head>
 
-        <p>Seu código para redefinir a senha é:</p>
+      <body
+        style="
+          margin: 0;
+          padding: 40px 20px;
+          background-color: #f4f4f5;
+          font-family: Arial, Helvetica, sans-serif;
+          color: #18181b;
+        "
+      >
+        <div
+          style="
+            max-width: 520px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+          "
+        >
+          <!-- Header -->
+          <div
+            style="
+              padding: 28px;
+              text-align: center;
+              background-color: #18181b;
+            "
+          >
+            <h1
+              style="
+                margin: 0;
+                color: #ffffff;
+                font-size: 26px;
+              "
+            >
+              BookHub
+            </h1>
+          </div>
 
-        <h1>${code}</h1>
+          <!-- Content -->
+          <div style="padding: 40px 32px;">
+            <h2
+              style="
+                margin: 0 0 16px;
+                font-size: 24px;
+              "
+            >
+              Recuperação de senha
+            </h2>
 
-        <p>Esse código expira em 10 minutos.</p>
+            <p
+              style="
+                margin: 0 0 28px;
+                color: #52525b;
+                font-size: 16px;
+                line-height: 1.6;
+              "
+            >
+              Recebemos uma solicitação para redefinir a senha
+              da sua conta. Utilize o código abaixo para continuar:
+            </p>
 
-        <p>Se você não solicitou a recuperação de senha,
-        ignore este e-mail.</p>
-      `,
+            <!-- Code -->
+            <div
+              style="
+                padding: 24px;
+                margin-bottom: 28px;
+                background-color: #f4f4f5;
+                border: 1px solid #e4e4e7;
+                border-radius: 12px;
+                text-align: center;
+              "
+            >
+              <span
+                style="
+                  display: block;
+                  margin-bottom: 8px;
+                  color: #71717a;
+                  font-size: 13px;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                "
+              >
+                Seu código
+              </span>
+
+              <strong
+                style="
+                  font-size: 36px;
+                  letter-spacing: 8px;
+                  color: #18181b;
+                "
+              >
+                ${code}
+              </strong>
+            </div>
+
+            <p
+              style="
+                margin: 0 0 12px;
+                color: #52525b;
+                font-size: 14px;
+              "
+            >
+              ⏱️ Este código expira em <strong>10 minutos</strong>.
+            </p>
+
+            <p
+              style="
+                margin: 0;
+                color: #71717a;
+                font-size: 13px;
+                line-height: 1.6;
+              "
+            >
+              Se você não solicitou a recuperação de senha,
+              pode ignorar este e-mail. Sua conta continuará segura.
+            </p>
+          </div>
+
+          <!-- Footer -->
+          <div
+            style="
+              padding: 20px 32px;
+              border-top: 1px solid #e4e4e7;
+              text-align: center;
+            "
+          >
+            <p
+              style="
+                margin: 0;
+                color: #a1a1aa;
+                font-size: 12px;
+              "
+            >
+              © ${new Date().getFullYear()} BookHub
+            </p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `,
     });
 
 
