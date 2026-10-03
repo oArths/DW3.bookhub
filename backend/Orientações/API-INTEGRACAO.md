@@ -16,12 +16,12 @@
 
 **Corpo da requisição:**
 ```json
-{
-  "username": "maria_leitora",
-  "email": "maria@email.com",
-  "password": "minhasenha123",
-  "bio": "opcional"
-}
+  {
+    "username": "maria_leitora",
+    "email": "maria@email.com",
+    "password": "minhasenha123",
+    "bio": "opcional"
+  }
 ```
 
 **Resposta (201 Created):**

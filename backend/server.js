@@ -1,4 +1,10 @@
 require('dotenv').config();
+const dns = require('node:dns');
+
+// O resolvedor DNS padrão desta máquina recusa consultas SRV do MongoDB Atlas
+// (querySrv ECONNREFUSED). Forçamos resolvers públicos aqui dentro do Node.
+dns.setServers(['8.8.8.8', '1.1.1.1']);
+
 const express = require('express');
 const cors = require('cors');
 const conectarBancoDeDados = require('./config/db');
@@ -27,7 +33,6 @@ app.use('/livros', livroRoutes);
 app.use('/reviews', reviewRoutes);
 
 const PORT = process.env.PORT || 3000;
-
 conectarBancoDeDados().then(() => {
   app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
