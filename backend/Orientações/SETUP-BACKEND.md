@@ -30,7 +30,11 @@ Crie um arquivo chamado exatamente `.env` na raiz do projeto (mesmo nível do `s
 ```
 MONGO_URI=mongodb+srv://usuario:senha@endereco-do-cluster.mongodb.net/bookhub?appName=NomeDoApp
 PORT=3000
+PRH_USERNAME=usuario_fornecido_pela_penguin_random_house
+PRH_PASSWORD=senha_fornecida_pela_penguin_random_house
 ```
+
+As credenciais da API Penguin Random House são necessárias para a busca de livros e devem ser obtidas junto ao provedor. Não compartilhe nem versione o arquivo `.env`.
 
 ## 5. Rodar o servidor
 

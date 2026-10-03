@@ -1,5 +1,6 @@
 const express = require('express');
 const Livro = require('../models/Livro');
+const { consultarLivros } = require('../services/livroConsulta');
 
 const router = express.Router();
 
@@ -10,6 +11,19 @@ router.get('/', async (req, res) => {
     res.json(livros);
   } catch (erro) {
     res.status(500).json({ erro: erro.message });
+  }
+});
+
+// GET /livros/busca?q=termo -> consulta livros na API Penguin Random House
+router.get('/busca', async (req, res) => {
+  try {
+    const livros = await consultarLivros(req.query.q, {
+      maxResults: req.query.maxResults,
+    });
+    res.json(livros);
+  } catch (erro) {
+    const status = erro.message === 'Informe um termo para buscar livros.' ? 400 : 502;
+    res.status(status).json({ erro: erro.message });
   }
 });
 

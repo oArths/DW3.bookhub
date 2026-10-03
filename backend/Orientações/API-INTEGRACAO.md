@@ -49,6 +49,24 @@ A senha nunca é devolvida pela API, mesmo criptografada.
 ### Listar todos os livros
 `GET /livros`
 
+### Buscar livros na API externa
+`GET /livros/busca?q=termo&maxResults=20`
+
+A busca usa a API Penguin Random House e retorna uma lista de títulos adaptados ao formato do BookHub:
+```json
+[
+  {
+    "titulo": "Dom Casmurro",
+    "autor": "Machado de Assis",
+    "anoPublicacao": 1899,
+    "descricao": "Descrição do livro",
+    "capaUrl": "",
+    "generos": ["Fiction"]
+  }
+]
+```
+`q` é obrigatório. `maxResults` é opcional e limitado a 40 resultados. Configure `PRH_USERNAME` e `PRH_PASSWORD` no `.env` do back-end; a API exige autenticação Basic. A busca pode retornar capa vazia porque os metadados não incluem uma URL pública da imagem.
+
 ### Buscar um livro específico
 `GET /livros/:id`
 
