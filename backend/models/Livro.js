@@ -1,12 +1,14 @@
 const mongoose = require('mongoose');
 
 const livroSchema = new mongoose.Schema({
-  titulo: { type: String, required: true },
-  autor: { type: String, required: true },
+  // ID interno: o MongoDB cria sozinho (campo _id)
+
+  // ID externo: o ID do livro na API da Penguin
+  idExterno: { type: String, required: true, unique: true, trim: true },
+
+  titulo: { type: String, required: true, trim: true },
+
   capaUrl: { type: String, default: '' },
-  descricao: { type: String, default: '' },
-  anoPublicacao: { type: Number },
-  generos: { type: [String], default: [] },
 }, {
   timestamps: true,
 });
