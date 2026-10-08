@@ -4,7 +4,7 @@ import { ApiError, UserInputLogin } from "../../services/userario";
 import { loginUser } from "../../services/userario";
 import axios from "axios";
 import { useSession } from "../../store/session";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 interface UserDataInterface {
     email: string
@@ -25,7 +25,6 @@ export default function Login() {
 
     const handlerLoginUser = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.table(userData)
         if (userData.email.length <= 0 || userData.senha.length <= 0) {
             toastWarn('Preencha todos os campos antes de se cadastrar')
 
@@ -56,7 +55,13 @@ export default function Login() {
                 const mensagem = error.response?.data.erro;
                 if (typeof mensagem == "string") {
                     toastWarn(mensagem)
+                } else if (!error.response) {
+                    toastWarn("Não foi possível conectar ao servidor. Verifique se o backend está iniciado e tente novamente.");
+                } else {
+                    toastWarn("Não foi possível entrar na conta. Tente novamente.");
                 }
+            } else {
+                toastWarn("Ocorreu um erro inesperado ao entrar na conta. Tente novamente.");
             }
         }
 
@@ -170,6 +175,9 @@ export default function Login() {
                     Ao entrar, você concorda com nossos
                     <a href="#"> Termos de Uso</a> e
                     <a href="#"> Política de Privacidade</a>.
+                </p>
+                <p className="auth-sub">
+                    Quer conhecer os livros antes? <Link to="/catalogo">Explore o catálogo</Link>
                 </p>
             </div>
         </main>

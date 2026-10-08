@@ -29,7 +29,6 @@ export default function Cadastro() {
 
   const handlerCreateUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.table(userData)
     if (userData.email.length <= 0 || userData.name.length <= 0 || userData.senha.length <= 0 || userData.senhaConfirmação.length <= 0) {
       toastWarn('Preencha todos os campos antes de se cadastrar')
       return;
@@ -64,12 +63,17 @@ export default function Cadastro() {
       }
 
     } catch (error) {
-
       if (axios.isAxiosError<ApiError>(error)) {
         const mensagem = error.response?.data.erro;
         if (typeof mensagem == "string") {
           toastWarn(mensagem)
+        } else if (!error.response) {
+          toastWarn("Não foi possível conectar ao servidor. Verifique se o backend está iniciado e tente novamente.");
+        } else {
+          toastWarn("Não foi possível concluir o cadastro. Tente novamente.");
         }
+      } else {
+        toastWarn("Ocorreu um erro inesperado ao criar sua conta. Tente novamente.");
       }
     }
 
@@ -230,4 +234,3 @@ export default function Cadastro() {
     </main>
   </div>)
 }
-
