@@ -12,6 +12,7 @@ const conectarBancoDeDados = require('./config/db');
 const usuarioRoutes = require('./routes/usuarioRoutes');
 const livroRoutes = require('./routes/livroRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const listaRoutes = require('./routes/listaRoutes');
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.get('/', (req, res) => {
 app.use('/usuarios', usuarioRoutes);
 app.use('/livros', livroRoutes);
 app.use('/reviews', reviewRoutes);
+app.use('/listas', listaRoutes);
 
 const PORT = process.env.PORT || 3000;
 conectarBancoDeDados().then(() => {
