@@ -11,6 +11,7 @@ import NovaSenha from "./pages/novaSenha";
 import Home from "./pages/home";
 import LivroDetalhes from "./pages/livroDetalhes";
 import Catalogo from "./pages/catalogo";
+import Colecao from "./pages/colecao";
 import { ProtectedRoute } from "./route/protectedRoute";
 
 createRoot(document.getElementById("root")).render(
@@ -20,6 +21,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/" element={<Catalogo />} />
         <Route path="/catalogo" element={<Catalogo />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/colecao" element={<Colecao />} />
         <Route path="/livros/:id" element={<LivroDetalhes />} />
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
