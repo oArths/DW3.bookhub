@@ -17,9 +17,7 @@ export default function SiteHeader() {
         </Link>
         <nav className="hidden items-center gap-5 text-xs text-slate-500 sm:flex" aria-label="Navegação principal">
           <Link to="/catalogo" className="hover:text-violet-700">Início</Link>
-          <Link to="/catalogo" className="font-semibold text-violet-700">Catálogo</Link>
-          <Link to={user ? "/home" : "/login"} className="hover:text-violet-700">Minha Estante</Link>
-          <Link to="/catalogo" className="hover:text-violet-700">Comunidade</Link>
+          <Link to={user ? "/colecao" : "/login"} className="hover:text-violet-700">Minha Estante</Link>
         </nav>
         <SearchBooks className="hidden w-48 sm:block" />
         <Link

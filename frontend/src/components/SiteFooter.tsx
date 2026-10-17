@@ -1,7 +1,8 @@
-/**
- * Rodapé compartilhado pelo BookHub (catálogo, detalhes do livro e perfil).
- */
+import { useSession } from "../store/session";
+
 export default function SiteFooter() {
+  const user = useSession((state) => state.user);
+
   return (
     <footer className="bg-slate-950 text-slate-300">
       <div className="mx-auto grid max-w-6xl gap-8 px-5 py-8 sm:grid-cols-3">
@@ -14,17 +15,15 @@ export default function SiteFooter() {
         <div>
           <h3 className="text-xs font-semibold text-white">Plataforma</h3>
           <ul className="mt-2 space-y-1.5 text-xs text-slate-400">
-            <li><a href="/catalogo" className="hover:text-white">Explore o catálogo</a></li>
-            <li><a href="/catalogo" className="hover:text-white">Comunidade de leitores</a></li>
-            <li><a href="/catalogo" className="hover:text-white">Sobre o BookHub</a></li>
+            <li><a href="/catalogo" className="hover:text-white">Catálogo</a></li>
+            <li><a href={user ? "/home" : "/login"} className="hover:text-white">Perfil</a></li>
+            <li><a href={user ? "/colecao" : "/login"} className="hover:text-white">Estante</a></li>
           </ul>
         </div>
         <div>
           <h3 className="text-xs font-semibold text-white">Suporte</h3>
           <ul className="mt-2 space-y-1.5 text-xs text-slate-400">
-            <li><a href="mailto:suporte@bookhub.com" className="hover:text-white">Ajuda</a></li>
-            <li><a href="mailto:suporte@bookhub.com" className="hover:text-white">Fale conosco</a></li>
-            <li><a href="mailto:suporte@bookhub.com" className="hover:text-white">Privacidade</a></li>
+            <li><a href="mailto:onboarding@resend.dev" className="hover:text-white">Fale conosco</a></li>
           </ul>
         </div>
       </div>
