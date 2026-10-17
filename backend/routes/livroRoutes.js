@@ -67,7 +67,7 @@ router.post('/', validarCorpo(livroSchema), async (req, res) => {
     const livro = await Livro.findOneAndUpdate(
       { idExterno },
       { $set: { titulo, capaUrl: capaUrl || '' } },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
+      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
     );
 
     res.status(200).json(livro);

@@ -133,7 +133,7 @@ router.patch('/:listaId/livros/:livroId', validarCorpo(atualizarStatusSchema), a
     const item = await ListaLivro.findOneAndUpdate(
       { listaId: lista._id, livroId: req.params.livroId },
       { $set: { statusLeitura } },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
     if (!item) {
       return res.status(404).json({ erro: 'Livro não está nesta lista.' });

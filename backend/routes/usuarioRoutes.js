@@ -373,7 +373,7 @@ router.patch('/:id', validarCorpo(atualizarUsuarioSchema), async (req, res) => {
     const usuario = await Usuario.findByIdAndUpdate(
       req.params.id,
       { $set: atualizacoes },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     ).select('-passwordHash');
 
     if (!usuario) {
