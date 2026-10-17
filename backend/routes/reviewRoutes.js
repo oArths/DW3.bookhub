@@ -1,16 +1,13 @@
 const express = require('express');
 const Review = require('../models/Review');
+const { validarCorpo, reviewSchema } = require('../schemas');
 
 const router = express.Router();
 
 // POST /reviews -> cria uma avaliação (nota + texto) de um livro
-router.post('/', async (req, res) => {
+router.post('/', validarCorpo(reviewSchema), async (req, res) => {
   try {
     const { usuarioId, livroId, nota, texto } = req.body;
-
-    if (!usuarioId || !livroId || nota === undefined) {
-      return res.status(400).json({ erro: 'usuarioId, livroId e nota são obrigatórios.' });
-    }
 
     const review = await Review.create({ usuarioId, livroId, nota, texto });
     res.status(201).json(review);

@@ -1,6 +1,7 @@
 const express = require('express');
 const Livro = require('../models/Livro');
 const { consultarLivros } = require('../services/livroConsulta');
+const { validarCorpo, livroSchema } = require('../schemas');
 
 const router = express.Router();
 
@@ -59,13 +60,9 @@ router.get('/:id', async (req, res) => {
 
 // POST /livros -> salva a referência de um livro vindo da API externa.
 // Se o idExterno já existir, atualiza título e capa em vez de duplicar.
-router.post('/', async (req, res) => {
+router.post('/', validarCorpo(livroSchema), async (req, res) => {
   try {
     const { idExterno, titulo, capaUrl } = req.body;
-
-    if (!idExterno || !titulo) {
-      return res.status(400).json({ erro: 'idExterno e titulo são obrigatórios.' });
-    }
 
     const livro = await Livro.findOneAndUpdate(
       { idExterno },

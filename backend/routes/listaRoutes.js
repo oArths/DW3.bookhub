@@ -3,6 +3,12 @@ const Lista = require('../models/Lista');
 const Livro = require('../models/Livro');
 const ListaLivro = require('../models/ListaLivro');
 const { STATUS_LEITURA } = require('../models/ListaLivro');
+const {
+  validarCorpo,
+  listaSchema,
+  adicionarLivroListaSchema,
+  atualizarStatusSchema,
+} = require('../schemas');
 
 const router = express.Router();
 
@@ -33,12 +39,9 @@ async function obterListaDoUsuario(req, res, usuarioId) {
 }
 
 // POST /listas -> cria uma lista para o usuário
-router.post('/', async (req, res) => {
+router.post('/', validarCorpo(listaSchema), async (req, res) => {
   try {
     const { usuarioId, nome, descricao } = req.body;
-    if (!usuarioId || !nome) {
-      return res.status(400).json({ erro: 'usuarioId e nome são obrigatórios.' });
-    }
     const lista = await Lista.create({ usuarioId, nome, descricao });
     res.status(201).json(lista);
   } catch (erro) {
@@ -58,15 +61,9 @@ router.get('/usuario/:usuarioId', async (req, res) => {
 
 // POST /listas/:listaId/livros -> adiciona um livro à lista
 // body: { usuarioId, livroId, statusLeitura? }
-router.post('/:listaId/livros', async (req, res) => {
+router.post('/:listaId/livros', validarCorpo(adicionarLivroListaSchema), async (req, res) => {
   try {
     const { usuarioId, livroId, statusLeitura } = req.body;
-    if (!livroId) {
-      return res.status(400).json({ erro: 'livroId é obrigatório.' });
-    }
-    if (statusLeitura && !STATUS_LEITURA.includes(statusLeitura)) {
-      return res.status(400).json({ erro: `statusLeitura deve ser um de: ${STATUS_LEITURA.join(', ')}.` });
-    }
 
     const lista = await obterListaDoUsuario(req, res, usuarioId);
     if (!lista) return;
@@ -112,12 +109,9 @@ router.get('/:listaId/livros', async (req, res) => {
 
 // PATCH /listas/:listaId/livros/:livroId -> atualiza o status de leitura
 // body: { usuarioId, statusLeitura }
-router.patch('/:listaId/livros/:livroId', async (req, res) => {
+router.patch('/:listaId/livros/:livroId', validarCorpo(atualizarStatusSchema), async (req, res) => {
   try {
     const { usuarioId, statusLeitura } = req.body;
-    if (!STATUS_LEITURA.includes(statusLeitura)) {
-      return res.status(400).json({ erro: `statusLeitura deve ser um de: ${STATUS_LEITURA.join(', ')}.` });
-    }
 
     const lista = await obterListaDoUsuario(req, res, usuarioId);
     if (!lista) return;

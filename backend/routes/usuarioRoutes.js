@@ -3,6 +3,15 @@ const bcrypt = require('bcryptjs');
 const Usuario = require('../models/Usuario');
 const resend = require("../config/resend");
 const crypto = require("crypto");
+const {
+  validarCorpo,
+  cadastroSchema,
+  loginSchema,
+  esqueciSenhaSchema,
+  verificarCodigoSchema,
+  redefinirSenhaSchema,
+  atualizarUsuarioSchema,
+} = require('../schemas');
 const router = express.Router();
 // const JWT_SECRET = process.env.JWT_SECRET
 
@@ -11,19 +20,15 @@ const router = express.Router();
 const COOLDOWN_RESET_MS = 60 * 1000;
 
 // POST /usuarios -> cria um novo usuário (cadastro)
-router.post('/', async (req, res) => {
+router.post('/', validarCorpo(cadastroSchema), async (req, res) => {
   try {
-    const { username, email, password, bio } = req.body;
-
-    if (!username || !email || !password) {
-      return res.status(400).json({ erro: 'username, email e password são obrigatórios.' });
-    }
+    const { username, email, password, bio, nome } = req.body;
 
     // Nunca salvamos a senha em texto puro: o bcrypt transforma
     // "123456" em um hash irreversível, tipo "$2a$10$N9qo8u...".
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const usuario = await Usuario.create({ username, email, passwordHash, bio });
+    const usuario = await Usuario.create({ username, email, passwordHash, bio, nome });
 
     // Removemos o hash da resposta por segurança, mesmo sendo
     // um hash — não há motivo para expor isso na API.
@@ -39,13 +44,9 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', validarCorpo(loginSchema), async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ erro: 'email e password são obrigatórios.' });
-    }
 
     const usuario = await Usuario.findOne({ email });
     if (!usuario) {
@@ -74,13 +75,9 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', validarCorpo(esqueciSenhaSchema), async (req, res) => {
   try {
     const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ erro: 'email é obrigatório.' });
-    }
 
     const usuario = await Usuario.findOne({ email });
 
@@ -291,15 +288,9 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 
-router.post("/verify-reset-code", async (req, res) => {
+router.post("/verify-reset-code", validarCorpo(verificarCodigoSchema), async (req, res) => {
   try {
     const { email, code } = req.body;
-
-    if (!email || !code) {
-      return res.status(400).json({
-        erro: "Email e código são obrigatórios.",
-      });
-    }
 
     const usuario = await Usuario.findOne({
       email,
@@ -328,19 +319,13 @@ router.post("/verify-reset-code", async (req, res) => {
   }
 });
 
-router.post("/reset-password", async (req, res) => {
+router.post("/reset-password", validarCorpo(redefinirSenhaSchema), async (req, res) => {
   try {
     const {
       email,
       code,
       password,
     } = req.body;
-
-    if (!email || !code || !password) {
-      return res.status(400).json({
-        erro: "Email, código e senha são obrigatórios.",
-      });
-    }
 
     const usuario = await Usuario.findOne({
       email,
