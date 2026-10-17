@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { FormEvent, useEffect, useMemo, useState} from "react";
+import SiteHeader from "../../components/SiteHeader";
+import SiteFooter from "../../components/SiteFooter";
 
 type ReadingStatus = "Quero ler" | "Lendo" | "Lido";
 type StatusFilter = "Todos" | ReadingStatus;
@@ -271,18 +272,7 @@ export default function Colecao() {
 
   return (
     <div className="min-h-screen bg-[#f7f7fb] font-sans text-slate-900">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex min-h-14 max-w-6xl items-center justify-between gap-4 px-5">
-          <Link to="/catalogo" className="flex items-center gap-2 text-base font-extrabold text-violet-700"><span aria-hidden="true"></span>BookHub</Link>
-          <nav className="flex items-center gap-2 text-[11px] text-slate-500 sm:gap-5" aria-label="Navegação principal">
-            <Link to="/catalogo" className="hover:text-violet-700">Início</Link>
-            <Link to="/catalogo" className="hover:text-violet-700">Catálogo</Link>
-            <Link to="/colecao" aria-current="page" className="border-b-2 border-violet-600 py-5 font-semibold text-violet-700">Minha coleção</Link>
-            <Link to="/" className="hidden hover:text-violet-700 sm:block">Comunidade</Link>
-          </nav>
-          <button type="button" aria-label="Perfil de Lucas Oliveira" className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-violet-100 text-[10px] font-bold text-violet-700">LO</button>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="mx-auto min-h-[calc(100vh-126px)] max-w-6xl px-5 py-5 sm:py-7">
         <div className="mb-4 flex items-center justify-between gap-4">
@@ -363,9 +353,7 @@ export default function Colecao() {
         )}
       </main>
 
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl justify-between px-5 py-3 text-[9px] text-slate-400"><span>© 2026 BookHub</span><a href="mailto:suporte@bookhub.com" className="hover:text-violet-700">Ajuda e suporte</a></div>
-      </footer>
+      <SiteFooter/>
 
       {(adding || editing || deleteTarget) && (
         <div className="fixed inset-0 z-30 grid place-items-center overflow-y-auto bg-slate-950/40 p-4" onMouseDown={(event) => { if (event.target === event.currentTarget) { setAdding(false); setEditing(null); setDeleteTarget(null); } }}>
