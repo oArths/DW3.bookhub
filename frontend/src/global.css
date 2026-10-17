@@ -19,6 +19,7 @@
   --bh-font: "Inter", system-ui, sans-serif;
 }
 
+
 *,
 *::before,
 *::after {
@@ -461,4 +462,13 @@ body.auth-page {
   .auth-quote {
     display: none;
   }
+}
+
+/* Toasts (react-toastify) — tamanho de fonte reduzido para 14px */
+.Toastify__toast {
+  font-size: 14px;
+}
+
+.Toastify__toast-body {
+  font-size: 14px;
 }
