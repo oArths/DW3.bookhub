@@ -12,6 +12,14 @@ export interface Book {
   pages: number;
   language: string;
   genres: string[];
+  /** Quantidade de edições catalogadas na Open Library. */
+  editionCount?: number;
+  /** Existe exemplar para leitura/empréstimo no archive.org. */
+  availableOnline?: boolean;
+  /** Identificador do item no archive.org (campo `ia`). */
+  archiveId?: string;
+  /** Página da obra na Open Library. */
+  openLibraryUrl?: string;
 }
 
 export const bookCatalog: Book[] = [

@@ -1,43 +1,45 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { bookCatalog, type Book } from "../../data/books";
+import SearchBooks from "../../components/SearchBooks";
+import SiteHeader from "../../components/SiteHeader";
+import SiteFooter from "../../components/SiteFooter";
+import { useRequireAuth } from "../../hooks/useRequireAuth";
+import type { Book } from "../../data/books";
+import {
+  getTrendingBooks,
+  searchBooks,
+  type OpenLibrarySort,
+} from "../../services/api_openlibery";
 
-const categories = ["Todos", "Ficção", "Romance", "Sci-fi", "Fantasia", "Biografia", "Autoajuda"];
-const booksPerPage = 8;
-
-function CatalogHeader({ search, onSearchChange }: { search: string; onSearchChange: (value: string) => void }) {
-  return (
-    <header className="border-b border-slate-200 bg-white">
-      <div className="mx-auto flex min-h-14 max-w-6xl items-center justify-between gap-4 px-5">
-        <Link to="/catalogo" className="text-lg font-extrabold tracking-tight text-violet-700">
-          BookHub
-        </Link>
-        <nav className="hidden items-center gap-5 text-xs text-slate-500 sm:flex" aria-label="Navegação principal">
-          <Link to="/" className="hover:text-violet-700">Início</Link>
-          <Link to="/catalogo" className="font-semibold text-violet-700">Catálogo</Link>
-          <Link to="/" className="hover:text-violet-700">Minha Estante</Link>
-          <Link to="/" className="hover:text-violet-700">Comunidade</Link>
-        </nav>
-        <label className="hidden sm:block">
-          <span className="sr-only">Pesquisar livros no catálogo</span>
-          <input
-            type="search"
-            value={search}
-            placeholder="Buscar livros, autores..."
-            onChange={(event) => onSearchChange(event.target.value)}
-            className="w-48 rounded-full bg-slate-100 px-4 py-2 text-xs outline-none placeholder:text-slate-500 focus:ring-2 focus:ring-violet-300"
-          />
-        </label>
-        <Link to="/" className="rounded-full bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-700 hover:bg-violet-100">
-          Entrar
-        </Link>
-      </div>
-    </header>
-  );
+interface Category {
+  label: string;
+  /** Assunto enviado ao campo `subject` do Solr. Sem valor, usa os destaques. */
+  subject?: string;
 }
+
+const categories: Category[] = [
+  { label: "Todos" },
+  { label: "Ficção", subject: "fiction" },
+  { label: "Romance", subject: "romance" },
+  { label: "Sci-fi", subject: "science fiction" },
+  { label: "Fantasia", subject: "fantasy" },
+  { label: "Biografia", subject: "biography" },
+  { label: "Autoajuda", subject: "self-help" },
+];
+
+/** Gênero carregado na primeira visita ao catálogo. */
+const DEFAULT_CATEGORY = "Ficção";
+
+const booksPerPage = 8;
 
 function BookCard({ book }: { book: Book }) {
   const [added, setAdded] = useState(false);
+  const { requireAuth } = useRequireAuth();
+
+  function toggleAdded() {
+    if (!requireAuth("Você precisa estar logado para adicionar livros à sua estante.")) return;
+    setAdded((current) => !current);
+  }
 
   return (
     <article className="flex flex-col overflow-hidden rounded-md border border-slate-100 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
@@ -47,9 +49,16 @@ function BookCard({ book }: { book: Book }) {
         className="group flex h-28 items-center justify-center bg-slate-50 sm:h-36"
       >
         {book.cover ? (
-          <img src={book.cover} alt={`Capa de ${book.title}`} className="h-full w-full object-cover" />
+          <img
+            src={book.cover}
+            alt={`Capa de ${book.title}`}
+            loading="lazy"
+            className="h-full w-full object-contain p-2"
+          />
         ) : (
-          <span className="text-[10px] text-slate-300 transition group-hover:text-violet-400">Capa do livro</span>
+          <span className="px-2 text-center text-[10px] text-slate-300 transition group-hover:text-violet-400">
+            Capa do livro
+          </span>
         )}
       </Link>
       <div className="flex flex-1 flex-col p-3">
@@ -57,11 +66,13 @@ function BookCard({ book }: { book: Book }) {
           {book.title}
         </Link>
         <p className="mt-0.5 truncate text-[9px] text-slate-500">
-          {book.author} · {book.genres[0]} · ★ {book.rating.toFixed(1)}
+          {book.author}
+          {book.genres[0] ? ` · ${book.genres[0]}` : ""}
+          {book.rating > 0 ? ` · ★ ${book.rating.toFixed(1)}` : ""}
         </p>
         <button
           type="button"
-          onClick={() => setAdded((current) => !current)}
+          onClick={toggleAdded}
           aria-pressed={added}
           className={`mt-2 rounded-md px-2 py-1.5 text-[10px] font-semibold text-white transition ${
             added ? "bg-emerald-600 hover:bg-emerald-700" : "bg-violet-700 hover:bg-violet-800"
@@ -74,75 +85,98 @@ function BookCard({ book }: { book: Book }) {
   );
 }
 
-function CatalogFooter() {
+function BookCardSkeleton() {
   return (
-    <footer className="bg-slate-950 text-slate-300">
-      <div className="mx-auto grid max-w-6xl gap-8 px-5 py-7 sm:grid-cols-3">
-        <div>
-          <h2 className="text-xs font-bold text-white">BookHub</h2>
-          <p className="mt-2 max-w-xs text-[10px] leading-4 text-slate-400">
-            Descubra livros, compartilhe resenhas e encontre sua próxima leitura.
-          </p>
-        </div>
-        <div>
-          <h3 className="text-[10px] font-semibold text-white">Plataforma</h3>
-          <p className="mt-2 text-[10px] text-slate-400">Explore o catálogo e conheça novos livros.</p>
-        </div>
-        <div>
-          <h3 className="text-[10px] font-semibold text-white">Suporte</h3>
-          <a href="mailto:suporte@bookhub.com" className="mt-2 block text-[10px] text-slate-400 hover:text-white">
-            Fale conosco
-          </a>
-        </div>
+    <div className="flex flex-col overflow-hidden rounded-md border border-slate-100 bg-white shadow-sm">
+      <div className="h-28 animate-pulse bg-slate-100 sm:h-36" />
+      <div className="space-y-2 p-3">
+        <div className="h-2.5 w-3/4 animate-pulse rounded bg-slate-100" />
+        <div className="h-2 w-1/2 animate-pulse rounded bg-slate-100" />
+        <div className="mt-2 h-6 animate-pulse rounded bg-slate-100" />
       </div>
-      <div className="mx-auto max-w-6xl border-t border-slate-800 px-5 py-3 text-[9px] text-slate-500">
-        © 2025 BookHub. Todos os direitos reservados.
-      </div>
-    </footer>
+    </div>
   );
 }
 
 export default function Catalogo() {
-  const [category, setCategory] = useState("Todos");
-  const [sort, setSort] = useState("popular");
-  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState(DEFAULT_CATEGORY);
+  const [sort, setSort] = useState<OpenLibrarySort>("relevance");
   const [page, setPage] = useState(1);
 
-  function updateSearch(value: string) {
-    setSearch(value);
-    setPage(1);
-  }
+  const [books, setBooks] = useState<Book[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
 
-  const filteredBooks = useMemo(() => {
-    const normalizedSearch = search.trim().toLocaleLowerCase("pt-BR");
-    const results = bookCatalog.filter((book) => {
-      const matchesCategory = category === "Todos" || book.genres.includes(category);
-      const matchesSearch =
-        !normalizedSearch ||
-        `${book.title} ${book.author} ${book.genres.join(" ")}`
-          .toLocaleLowerCase("pt-BR")
-          .includes(normalizedSearch);
-      return matchesCategory && matchesSearch;
-    });
+  const activeCategory = categories.find((item) => item.label === category) ?? categories[0];
 
-    return [...results].sort((a, b) => {
-      if (sort === "title") return a.title.localeCompare(b.title, "pt-BR");
-      if (sort === "rating") return b.rating - a.rating;
-      return b.reviewCount - a.reviewCount;
-    });
-  }, [category, search, sort]);
+  // Busca inicial e a cada mudança de gênero, ordenação ou página.
+  useEffect(() => {
+    let active = true;
 
-  const pageCount = Math.max(1, Math.ceil(filteredBooks.length / booksPerPage));
-  const visibleBooks = filteredBooks.slice((page - 1) * booksPerPage, page * booksPerPage);
+    async function loadBooks() {
+      setLoading(true);
+      setError("");
+
+      try {
+        const subject = activeCategory.subject;
+
+        if (subject) {
+          const { books: results, total: found } = await searchBooks({
+            genre: subject,
+            sort,
+            page,
+            limit: booksPerPage,
+          });
+          if (!active) return;
+          setBooks(results);
+          setTotal(found);
+        } else {
+          const results = await getTrendingBooks(booksPerPage);
+          if (!active) return;
+          setBooks(results);
+          setTotal(results.length);
+        }
+      } catch {
+        if (!active) return;
+        setBooks([]);
+        setTotal(0);
+        setError("Não foi possível carregar os livros agora. Tente novamente.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadBooks();
+
+    return () => {
+      active = false;
+    };
+  }, [activeCategory.subject, sort, page, reloadKey]);
+
+  const pageCount = Math.max(1, Math.ceil(total / booksPerPage));
+  const firstVisiblePage = Math.max(1, Math.min(page - 2, pageCount - 4));
+  const visiblePages = Array.from(
+    { length: Math.min(5, pageCount) },
+    (_, index) => firstVisiblePage + index,
+  );
 
   function selectCategory(nextCategory: string) {
     setCategory(nextCategory);
     setPage(1);
   }
 
+  function changeSort(value: string) {
+    setSort(value as OpenLibrarySort);
+    setPage(1);
+  }
+
+  const showEmptyState = !loading && books.length === 0 && !error;
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
-      <CatalogHeader search={search} onSearchChange={updateSearch} />
+      <SiteHeader />
 
       <main>
         <section className="bg-gradient-to-r from-violet-800 via-violet-700 to-purple-600 text-white">
@@ -160,49 +194,59 @@ export default function Catalogo() {
             <div className="flex flex-wrap items-center gap-2" aria-label="Filtrar por categoria">
               {categories.map((item) => (
                 <button
-                  key={item}
+                  key={item.label}
                   type="button"
-                  onClick={() => selectCategory(item)}
-                  aria-pressed={category === item}
+                  onClick={() => selectCategory(item.label)}
+                  aria-pressed={category === item.label}
                   className={`rounded-full px-3 py-1.5 text-[10px] font-semibold transition ${
-                    category === item
+                    category === item.label
                       ? "bg-violet-700 text-white"
                       : "bg-violet-100 text-violet-700 hover:bg-violet-200"
                   }`}
                 >
-                  {item}
+                  {item.label}
                 </button>
               ))}
               <label className="ml-auto flex items-center gap-2 text-[10px] text-slate-500">
                 Ordenar por
                 <select
                   value={sort}
-                  onChange={(event) => setSort(event.target.value)}
+                  onChange={(event) => changeSort(event.target.value)}
                   className="rounded border border-slate-200 bg-white px-2 py-1.5 text-[10px] text-slate-700 outline-none focus:ring-2 focus:ring-violet-300"
                 >
-                  <option value="popular">Mais populares</option>
+                  <option value="relevance">Mais relevantes</option>
                   <option value="rating">Melhor avaliados</option>
-                  <option value="title">Título</option>
+                  <option value="new">Mais recentes</option>
+                  <option value="old">Mais antigos</option>
+                  <option value="title">Título (A-Z)</option>
                 </select>
               </label>
             </div>
 
-            <label className="sm:hidden">
-              <span className="sr-only">Pesquisar livros</span>
-              <input
-                type="search"
-                value={search}
-                onChange={(event) => updateSearch(event.target.value)}
-                placeholder="Buscar por título, autor ou gênero..."
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-300"
-              />
-            </label>
-
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {visibleBooks.map((book) => <BookCard key={book.id} book={book} />)}
+            <div className="sm:hidden">
+              <SearchBooks className="w-full" placeholder="Buscar por título, autor..." />
             </div>
 
-            {visibleBooks.length === 0 && (
+            {error && (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700" role="alert">
+                <span>{error}</span>
+                <button
+                  type="button"
+                  onClick={() => setReloadKey((current) => current + 1)}
+                  className="rounded-md bg-red-700 px-3 py-1.5 text-[10px] font-semibold text-white hover:bg-red-800"
+                >
+                  Tentar novamente
+                </button>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-busy={loading}>
+              {loading
+                ? Array.from({ length: booksPerPage }, (_, index) => <BookCardSkeleton key={index} />)
+                : books.map((book) => <BookCard key={book.id} book={book} />)}
+            </div>
+
+            {showEmptyState && (
               <p className="rounded-lg border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
                 Nenhum livro encontrado. Tente outra busca ou categoria.
               </p>
@@ -213,19 +257,20 @@ export default function Catalogo() {
                 <button
                   type="button"
                   onClick={() => setPage((current) => Math.max(1, current - 1))}
-                  disabled={page === 1}
+                  disabled={page === 1 || loading}
                   className="rounded px-2 py-1 text-xs text-slate-500 hover:bg-violet-100 disabled:opacity-40"
                   aria-label="Página anterior"
                 >
                   ‹
                 </button>
-                {Array.from({ length: pageCount }, (_, index) => index + 1).map((pageNumber) => (
+                {visiblePages.map((pageNumber) => (
                   <button
                     key={pageNumber}
                     type="button"
                     onClick={() => setPage(pageNumber)}
+                    disabled={loading}
                     aria-current={page === pageNumber ? "page" : undefined}
-                    className={`min-w-7 rounded px-2 py-1 text-[10px] font-semibold ${
+                    className={`min-w-7 rounded px-2 py-1 text-[10px] font-semibold disabled:opacity-40 ${
                       page === pageNumber ? "bg-violet-700 text-white" : "text-slate-500 hover:bg-violet-100"
                     }`}
                   >
@@ -235,7 +280,7 @@ export default function Catalogo() {
                 <button
                   type="button"
                   onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
-                  disabled={page === pageCount}
+                  disabled={page === pageCount || loading}
                   className="rounded px-2 py-1 text-xs text-slate-500 hover:bg-violet-100 disabled:opacity-40"
                   aria-label="Próxima página"
                 >
@@ -246,7 +291,7 @@ export default function Catalogo() {
           </div>
         </section>
       </main>
-      <CatalogFooter />
+      <SiteFooter />
     </div>
   );
 }
