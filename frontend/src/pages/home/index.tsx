@@ -457,7 +457,7 @@ export default function Home() {
           {/* Sidebar do perfil */}
           <aside className="lg:sticky lg:top-6 lg:self-start">
             <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <div className="flex items-center gap-3">
+              {/* <div className="flex items-center gap-3">
                 <img
                   src={user.avatarUrl || UserDeafult}
                   alt={`Avatar de ${user.username}`}
@@ -467,7 +467,7 @@ export default function Home() {
                   <p className="truncate text-sm font-bold text-slate-900">{user.nome || user.username}</p>
                   <p className="truncate text-[10px] text-slate-500">@{user.username}</p>
                 </div>
-              </div>
+              </div> */}
 
               <nav className="mt-4 flex flex-col gap-1" aria-label="Navegação do perfil">
                 {NAV_ITEMS.map((item) => {
@@ -478,11 +478,10 @@ export default function Home() {
                       type="button"
                       onClick={() => irParaSecao(item)}
                       aria-current={ativo ? "true" : undefined}
-                      className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-xs font-medium transition ${
-                        ativo
-                          ? "bg-violet-50 text-violet-700"
-                          : "text-slate-600 hover:bg-slate-50 hover:text-violet-700"
-                      }`}
+                      className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-xs font-medium transition ${ativo
+                        ? "bg-violet-50 text-violet-700"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-violet-700"
+                        }`}
                     >
                       <NavIcon id={item.key} />
                       {item.label}
@@ -527,17 +526,14 @@ export default function Home() {
               </div>
 
               <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="flex flex-col items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <img
                       src={user.avatarUrl || UserDeafult}
                       alt={`Avatar de ${user.username}`}
-                      className="h-16 w-16 rounded-full border border-slate-200 bg-white object-cover"
+                      className="w-40 aspect-square rounded-full border border-slate-200 bg-white object-cover"
                     />
-                    <div>
-                      <p className="text-xs font-semibold text-slate-800">Avatar do perfil</p>
-                      <p className="text-[10px] text-slate-500">Seleção obrigatória</p>
-                    </div>
+                  
                   </div>
                   <button
                     type="button"

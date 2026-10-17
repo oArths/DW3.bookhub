@@ -1,11 +1,8 @@
 import { Link } from "react-router-dom";
 import SearchBooks from "./SearchBooks";
 import { useSession } from "../store/session";
+import { UserDeafult } from "../assets/";
 
-/**
- * Cabeçalho compartilhado pelo BookHub (catálogo, detalhes do livro e perfil).
- * Quando o usuário está logado, o botão da direita leva ao perfil (/home).
- */
 export default function SiteHeader() {
   const user = useSession((state) => state.user);
 
@@ -20,13 +17,21 @@ export default function SiteHeader() {
           <Link to={user ? "/colecao" : "/login"} className="hover:text-violet-700">Minha Estante</Link>
         </nav>
         <SearchBooks className="hidden w-48 sm:block" />
-        <Link
-          to={user ? "/home" : "/login"}
-          className="max-w-32 truncate rounded-full bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-700 hover:bg-violet-100"
-          aria-label={user ? `Perfil de ${user.username}` : "Entrar"}
-        >
-          {user ? user.username : "Entrar"}
-        </Link>
+        <div className="flex flex-row  items-center gap-3">
+
+          <img
+            src={user ? user.avatarUrl : UserDeafult}
+            alt={`Avatar de ${user ? user.username : "usuario"}`}
+            className="h-12 w-12 rounded-full border cursor-pointer border-slate-200 bg-white object-cover"
+          />
+          <Link
+            to={user ? "/home" : "/login"}
+            className="max-w-32 truncate rounded-full bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-700 hover:bg-violet-100"
+            aria-label={user ? `Perfil de ${user.username}` : "Entrar"}
+          >
+            {user ? user.username : "Entrar"}
+          </Link>
+        </div>
       </div>
     </header>
   );
