@@ -2,10 +2,11 @@ import { useState } from "react";
 import { toastWarn } from "../../utils/toast";
 import { ApiError, UserInputLogin } from "../../services/userario";
 import { loginUser } from "../../services/userario";
+import { loginFormSchema } from "../../utils/validacoes";
+import { validarComToast } from "../../utils/validarComToast";
 import axios from "axios";
 import { useSession } from "../../store/session";
-import { Link, useNavigate } from "react-router-dom";
-import { Bounce, ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 interface UserDataInterface {
     email: string
     senha: string
@@ -25,21 +26,18 @@ export default function Login() {
 
     const handlerLoginUser = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (userData.email.length <= 0 || userData.senha.length <= 0) {
-            toastWarn('Preencha todos os campos antes de se cadastrar')
 
-            return;
-        }
-        if (userData.senha.length < 8) {
-            toastWarn('As senhas deve ter no minimo 8 caracteres');
+        const dados = validarComToast(loginFormSchema, {
+            email: userData.email,
+            password: userData.senha,
+        });
+        if (!dados) return;
 
-            return;
-        }
         try {
 
             const inputUser: UserInputLogin = {
-                email: userData.email,
-                password: userData.senha,
+                email: dados.email,
+                password: dados.password,
             }
 
             const response = await loginUser(inputUser)
@@ -68,19 +66,6 @@ export default function Login() {
     }
     return (<div className="auth-shell">
         <aside className="auth-brand" aria-label="BookHub">
-            <ToastContainer
-                position="top-center"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick={false}
-                rtl={false}
-                pauseOnFocusLoss
-                pauseOnHover
-                theme="light"
-                transition={Bounce}
-            />
-
             <div className="auth-brand-inner">
                 <a className="auth-logo" href="/">
                     <span className="auth-logo-mark" aria-hidden="true"><img src="/logo.png" className="aspect-square w-[70%]" /></span>
@@ -176,9 +161,7 @@ export default function Login() {
                     <a href="#"> Termos de Uso</a> e
                     <a href="#"> Política de Privacidade</a>.
                 </p>
-                <p className="auth-sub">
-                    Quer conhecer os livros antes? <Link to="/catalogo">Explore o catálogo</Link>
-                </p>
+
             </div>
         </main>
     </div>)

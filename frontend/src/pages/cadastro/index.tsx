@@ -1,9 +1,10 @@
 import { useState } from "react"
-import { Bounce, ToastContainer } from 'react-toastify';
 import { ApiError, UserInputCreate, UserInputResponse } from "../../services/userario";
 import { createUser } from "../../services/userario";
 import axios from "axios";
 import { toastWarn } from "../../utils/toast";
+import { cadastroFormSchema } from "../../utils/validacoes";
+import { validarComToast } from "../../utils/validarComToast";
 import { useSession } from "../../store/session";
 import { useNavigate } from "react-router-dom";
 
@@ -29,26 +30,23 @@ export default function Cadastro() {
 
   const handlerCreateUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (userData.email.length <= 0 || userData.name.length <= 0 || userData.senha.length <= 0 || userData.senhaConfirmação.length <= 0) {
-      toastWarn('Preencha todos os campos antes de se cadastrar')
-      return;
-    }
 
-    if (userData.senha.length < 8 || userData.senhaConfirmação.length < 8) {
-      toastWarn('As senhas deve ter no minimo 8 caracteres');
-      return;
-    }
-    if (userData.senha !== userData.senhaConfirmação) {
-      toastWarn('As senhas deve ser iguais');
-      return;
-    }
+    // Mesmas regras validadas no back-end (Zod). Se algo estiver errado,
+    // a mensagem aparece no toast e o cadastro não é enviado.
+    const dados = validarComToast(cadastroFormSchema, {
+      username: userData.name,
+      email: userData.email,
+      password: userData.senha,
+      confirmacao: userData.senhaConfirmação,
+    });
+    if (!dados) return;
 
     try {
 
       const inputUser: UserInputCreate = {
-        username: userData.name,
-        email: userData.email,
-        password: userData.senha,
+        username: dados.username,
+        email: dados.email,
+        password: dados.password,
         bio: null
 
       }
@@ -84,18 +82,6 @@ export default function Cadastro() {
   return (<div className="auth-shell">
 
     <aside className="auth-brand" aria-label="BookHub">
-      <ToastContainer
-        position="top-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        pauseOnHover
-        theme="light"
-        transition={Bounce}
-      />
       <div className="auth-brand-inner">
         <a className="auth-logo" href="/">
           <span className="auth-logo-mark" aria-hidden="true"><img src="/logo.png" className="aspect-square w-[70%]" /></span>
@@ -112,7 +98,7 @@ export default function Cadastro() {
       <div className="auth-form-wrap">
         <h2>Cadastro</h2>
         <p className="auth-sub">
-          Já possui conta? <a href="/">Faça login</a>
+          Já possui conta? <a href="/login">Faça login</a>
         </p>
 
         <div className="auth-message auth-message--error" data-auth-message hidden role="alert"></div>
@@ -127,7 +113,8 @@ export default function Cadastro() {
                 name="name"
                 autoComplete="name"
                 placeholder="Seu nome"
-                minLength={2}
+                minLength={3}
+                maxLength={30}
                 onChange={(e) =>
                   setUserData((prev) => ({
                     ...prev,

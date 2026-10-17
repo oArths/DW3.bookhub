@@ -1,4 +1,7 @@
 import { useState, type FormEvent } from "react";
+import { toastWarn } from "../utils/toast";
+import { reviewFormSchema } from "../utils/validacoes";
+import { validarComErro } from "../utils/validarComToast";
 
 export interface ReviewSubmission {
   rating: number;
@@ -6,7 +9,8 @@ export interface ReviewSubmission {
 }
 
 interface ReviewFormProps {
-  onSubmit: (review: ReviewSubmission) => void;
+  /** Retorne `false` para indicar que o envio foi bloqueado (ex.: usuário não logado). */
+  onSubmit: (review: ReviewSubmission) => boolean | void;
 }
 
 export default function ReviewForm({ onSubmit }: ReviewFormProps) {
@@ -19,13 +23,23 @@ export default function ReviewForm({ onSubmit }: ReviewFormProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (rating === 0) {
-      setError("Escolha uma nota de 1 a 5 estrelas.");
+    // Mesma validação da API (Zod). A mensagem aparece no toast e inline.
+    const resultado = validarComErro(reviewFormSchema, { nota: rating, texto: comment });
+    if (!resultado.ok) {
+      setError(resultado.erro);
+      toastWarn(resultado.erro);
       setSubmitted(false);
       return;
     }
 
-    onSubmit({ rating, comment: comment.trim() });
+    const accepted = onSubmit({
+      rating: resultado.data.nota,
+      comment: (resultado.data.texto ?? "").trim(),
+    });
+    if (accepted === false) {
+      setSubmitted(false);
+      return;
+    }
     setError("");
     setSubmitted(true);
   }

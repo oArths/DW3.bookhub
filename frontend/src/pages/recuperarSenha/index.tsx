@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toastWarn } from "../../utils/toast";
 import { ApiError, ApiResponse, UserInputForgot, verifyCode } from "../../services/userario";
+import { emailFormSchema } from "../../utils/validacoes";
+import { validarComToast } from "../../utils/validarComToast";
 import axios from "axios";
-import { Bounce, ToastContainer } from "react-toastify";
 import { useResendTimer } from "../../store/resendTimer";
 
 
@@ -36,8 +37,9 @@ export default function RecuperarSenha() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setLoading(true)
     e.preventDefault();
-    if (userData.email.length <= 0) {
-      toastWarn('Preencha todos os campos antes de se cadastrar')
+
+    const dados = validarComToast(emailFormSchema, { email: userData.email });
+    if (!dados) {
       setLoading(false)
       return;
     }
@@ -51,14 +53,14 @@ export default function RecuperarSenha() {
     try {
 
       const inputUser: UserInputForgot = {
-        email: userData.email,
+        email: dados.email,
       }
 
       const response: ApiResponse | ApiError = await verifyCode(inputUser)
 
       if ('mensagem' in response) {
-        start(userData.email);
-        navigate(`/confirmar-codigo?email=${userData.email}`);
+        start(dados.email);
+        navigate(`/confirmar-codigo?email=${dados.email}`);
       }
     } catch (error) {
 
@@ -76,18 +78,6 @@ export default function RecuperarSenha() {
   return (
     <div className="auth-shell">
       <aside className="auth-brand" aria-label="BookHub">
-        <ToastContainer
-          position="top-center"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick={false}
-          rtl={false}
-          pauseOnFocusLoss
-          pauseOnHover
-          theme="light"
-          transition={Bounce}
-        />
         <div className="auth-brand-inner">
           <a className="auth-logo" href="/">
             <span className="auth-logo-mark" aria-hidden="true"><img src="/logo.png" className="aspect-square w-[70%]" /></span>
@@ -104,7 +94,7 @@ export default function RecuperarSenha() {
         <div className="auth-form-wrap auth-form-wrap--compact">
           <h2>Informe seu e-mail</h2>
           <p className="auth-sub">
-            Já possui conta? <a href="/">Faça login</a>
+            Já possui conta? <a href="/login">Faça login</a>
           </p>
 
           <div className="auth-message auth-message--error" data-auth-message hidden role="alert"></div>

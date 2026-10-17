@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Bounce, ToastContainer } from "react-toastify";
 import { toastWarn } from "../../utils/toast";
 import { ApiError, UserCodeResetPassword, UserInputResponse } from "../../services/userario";
 import { resetPassword } from "../../services/userario";
+import { novaSenhaFormSchema } from "../../utils/validacoes";
+import { validarComToast } from "../../utils/validarComToast";
 import { useSession } from "../../store/session";
 import axios from "axios";
 
@@ -38,20 +39,11 @@ export default function NovaSenha() {
 			return;
 		}
 
-		if (userData.senha.length <= 0 || userData.senhaConfirmação.length <= 0) {
-			toastWarn('Preencha a nova senha para criar a nova senha')
-			setLoading(false)
-			return;
-		}
-
-		if (userData.senha.length < 8) {
-			toastWarn('A nova senha deve ter no minimo 8 caracteres')
-			setLoading(false)
-			return;
-		}
-
-		if (userData.senha !== userData.senhaConfirmação) {
-			toastWarn('As senhas precisam ser iguais')
+		const dados = validarComToast(novaSenhaFormSchema, {
+			password: userData.senha,
+			confirmacao: userData.senhaConfirmação,
+		});
+		if (!dados) {
 			setLoading(false)
 			return;
 		}
@@ -60,7 +52,7 @@ export default function NovaSenha() {
 
 			const inputUser: UserCodeResetPassword = {
 				email: email,
-				password: userData.senha,
+				password: dados.password,
 				code: code
 			}
 
@@ -87,18 +79,6 @@ export default function NovaSenha() {
 	return (
 		<div className="auth-shell">
 			<aside className="auth-brand" aria-label="BookHub">
-				<ToastContainer
-					position="top-center"
-					autoClose={5000}
-					hideProgressBar={false}
-					newestOnTop={false}
-					closeOnClick={false}
-					rtl={false}
-					pauseOnFocusLoss
-					pauseOnHover
-					theme="light"
-					transition={Bounce}
-				/>
 				<div className="auth-brand-inner">
 					<a className="auth-logo" href="/">
 						<span className="auth-logo-mark" aria-hidden="true"><img src="/logo.png" className="aspect-square w-[70%]" /></span>

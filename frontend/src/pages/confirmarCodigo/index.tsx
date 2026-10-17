@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bounce, ToastContainer } from "react-toastify";
 import { toastSuccess, toastWarn } from "../../utils/toast";
 import { ApiError, ApiResponse, UserCodeLogin, UserInputForgot, getCode, verifyCode } from "../../services/userario";
+import { codigoSchema } from "../../utils/validacoes";
+import { validarComToast } from "../../utils/validarComToast";
 import axios from "axios";
 import { useSearchParams } from 'react-router-dom';
 import { useResendTimer } from "../../store/resendTimer";
@@ -83,8 +84,8 @@ export default function ConfirmarCodigo() {
       return;
     }
 
-    if (userData.code.length <= 0) {
-      toastWarn('Preencha o codigo para criar a nova senha')
+    const code = validarComToast(codigoSchema, userData.code);
+    if (!code) {
       setLoading(false)
       return;
     }
@@ -93,13 +94,13 @@ export default function ConfirmarCodigo() {
 
       const inputUser: UserCodeLogin = {
         email: email,
-        code: userData.code
+        code: code
       }
 
       const response: ApiResponse | ApiError = await getCode(inputUser)
 
       if ('mensagem' in response) {
-        navigate(`/nova-senha?email=${email}&code=${userData.code}`);
+        navigate(`/nova-senha?email=${email}&code=${code}`);
       }
     } catch (error) {
 
@@ -117,18 +118,6 @@ export default function ConfirmarCodigo() {
   return (
     <div className="auth-shell">
       <aside className="auth-brand" aria-label="BookHub">
-        <ToastContainer
-          position="top-center"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick={false}
-          rtl={false}
-          pauseOnFocusLoss
-          pauseOnHover
-          theme="light"
-          transition={Bounce}
-        />
         <div className="auth-brand-inner">
           <a className="auth-logo" href="/">
             <span className="auth-logo-mark" aria-hidden="true"><img src="/logo.png" className="aspect-square w-[70%]" /></span>
