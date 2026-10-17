@@ -361,6 +361,37 @@ router.post("/reset-password", validarCorpo(redefinirSenhaSchema), async (req, r
     });
   }
 });
+// PATCH /usuarios/:id -> atualiza os dados editáveis do perfil.
+// Permite apenas nome, username, bio e avatarUrl. E-mail e senha continuam
+// sendo alterados pelos fluxos de verificação já existentes.
+router.patch('/:id', validarCorpo(atualizarUsuarioSchema), async (req, res) => {
+  try {
+    // O req.body já chega validado e "limpo" pelo Zod (só nome, username,
+    // bio e avatarUrl são aceitos; campos desconhecidos são descartados).
+    const atualizacoes = req.body;
+
+    const usuario = await Usuario.findByIdAndUpdate(
+      req.params.id,
+      { $set: atualizacoes },
+      { new: true, runValidators: true }
+    ).select('-passwordHash');
+
+    if (!usuario) {
+      return res.status(404).json({ erro: 'Usuário não encontrado.' });
+    }
+
+    res.json(usuario);
+  } catch (erro) {
+    if (erro.name === 'CastError') {
+      return res.status(400).json({ erro: 'id inválido.' });
+    }
+    if (erro.code === 11000) {
+      return res.status(409).json({ erro: 'Nome de usuário já cadastrado.' });
+    }
+    res.status(500).json({ erro: erro.message });
+  }
+});
+
 // GET /usuarios/:id -> busca um usuário pelo id
 router.get('/:id', async (req, res) => {
   try {

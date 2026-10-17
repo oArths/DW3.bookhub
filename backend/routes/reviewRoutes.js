@@ -16,6 +16,18 @@ router.post('/', validarCorpo(reviewSchema), async (req, res) => {
   }
 });
 
+// GET /reviews/usuario/:usuarioId -> avaliações escritas pelo usuário,
+router.get('/usuario/:usuarioId', async (req, res) => {
+  try {
+    const reviews = await Review.find({ usuarioId: req.params.usuarioId })
+      .populate('livroId', 'titulo capaUrl idExterno')
+      .sort({ createdAt: -1 });
+    res.json(reviews);
+  } catch (erro) {
+    res.status(500).json({ erro: erro.message });
+  }
+});
+
 // GET /reviews/livro/:livroId -> lista as reviews de um livro específico,
 // já trazendo os dados do usuário que escreveu (via populate).
 router.get('/livro/:livroId', async (req, res) => {

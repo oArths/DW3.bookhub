@@ -19,11 +19,19 @@ export type UserCodeResetPassword = Pick<
 
 export interface UserInputResponse {
   _id: string;
+  nome: string;
   username: string;
   email: string;
   bio: string;
-  avatarURL: string;
+  avatarUrl: string;
   createdAt: string;
+}
+/** Campos que o próprio usuário pode editar no perfil. */
+export interface UserInputUpdate {
+  nome?: string;
+  username?: string;
+  bio?: string;
+  avatarUrl?: string;
 }
 export interface ApiError {
   erro: string;
@@ -62,4 +70,20 @@ async function resetPassword(
   return response.data;
 }
 
-export { createUser, loginUser, verifyCode, getCode, resetPassword };
+/** Atualiza os dados editáveis do perfil (nome, username, bio, avatar). */
+async function updateUser(
+  id: string,
+  dados: UserInputUpdate,
+): Promise<UserInputResponse> {
+  const response = await api.patch<UserInputResponse>(`/usuarios/${id}`, dados);
+  return response.data;
+}
+
+export {
+  createUser,
+  loginUser,
+  verifyCode,
+  getCode,
+  resetPassword,
+  updateUser,
+};

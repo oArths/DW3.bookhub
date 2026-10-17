@@ -88,6 +88,20 @@ router.post('/:listaId/livros', validarCorpo(adicionarLivroListaSchema), async (
   }
 });
 
+// GET /listas/livros/usuario/:usuarioId -> todos os livros salvos do usuário,
+// de todas as suas listas (com os dados de cada livro e o nome da lista).
+router.get('/livros/usuario/:usuarioId', async (req, res) => {
+  try {
+    const itens = await ListaLivro.find({ usuarioId: req.params.usuarioId })
+      .populate('livroId', 'titulo capaUrl idExterno')
+      .populate('listaId', 'nome')
+      .sort({ adicionadoEm: -1 });
+    res.json(itens);
+  } catch (erro) {
+    tratarErro(res, erro);
+  }
+});
+
 // GET /listas/:listaId/livros?status=lendo -> livros da lista (com dados do livro)
 router.get('/:listaId/livros', async (req, res) => {
   try {
