@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Bookmark } from "lucide-react"
 import { Link } from "react-router-dom";
 import SearchBooks from "../../components/SearchBooks";
 import SiteHeader from "../../components/SiteHeader";
@@ -13,7 +14,6 @@ import {
 
 interface Category {
   label: string;
-  /** Assunto enviado ao campo `subject` do Solr. Sem valor, usa os destaques. */
   subject?: string;
 }
 
@@ -61,25 +61,29 @@ function BookCard({ book }: { book: Book }) {
           </span>
         )}
       </Link>
-      <div className="flex flex-1 flex-col p-3">
-        <Link to={`/livros/${book.id}`} className="truncate text-[11px] font-bold text-slate-900 hover:text-violet-700">
+      <div className="flex flex-1 flex-col p-3 gap-1">
+        <Link to={`/livros/${book.id}`} className="truncate text-[16px] font-medium text-slate-900 hover:text-violet-700">
           {book.title}
         </Link>
-        <p className="mt-0.5 truncate text-[9px] text-slate-500">
+        <p className="mt-0.5 truncate text-[14px] text-slate-500">
           {book.author}
           {book.genres[0] ? ` · ${book.genres[0]}` : ""}
           {book.rating > 0 ? ` · ★ ${book.rating.toFixed(1)}` : ""}
         </p>
-        <button
-          type="button"
-          onClick={toggleAdded}
-          aria-pressed={added}
-          className={`mt-2 rounded-md px-2 py-1.5 text-[10px] font-semibold text-white transition ${
-            added ? "bg-emerald-600 hover:bg-emerald-700" : "bg-violet-700 hover:bg-violet-800"
-          }`}
-        >
-          {added ? "Adicionado à estante" : "Adicionar à estante"}
-        </button>
+        <div className="flex flex-row items-center justify-between gap-1">
+          <Link
+            className={` rounded-md cursor-pointer px-2 py-1.5 text-[10px] bg-violet-700 font-semibold w-full text-center text-white transition-all hover:scale-[102%]
+  `} to={`/livros/${book.id}`}>
+
+            Ver mais
+          </Link>
+          <button type="button"
+            onClick={toggleAdded}
+            aria-pressed={added}
+            className={`  p-1 border border-gray-600 rounded-md cursor-pointer transition-all hover:scale-[102%] ${added ? " bg-gray-800" : "bg-transparent"}`}>
+            <Bookmark size={20} className={`${added ? "stroke-gray-100" : "stroke-gray-800"} `} strokeWidth={1.5} />
+          </button>
+        </div>
       </div>
     </article>
   );
@@ -198,11 +202,10 @@ export default function Catalogo() {
                   type="button"
                   onClick={() => selectCategory(item.label)}
                   aria-pressed={category === item.label}
-                  className={`rounded-full px-3 py-1.5 text-[10px] font-semibold transition ${
-                    category === item.label
-                      ? "bg-violet-700 text-white"
-                      : "bg-violet-100 text-violet-700 hover:bg-violet-200"
-                  }`}
+                  className={`rounded-full px-3 py-1.5 text-[10px] font-semibold transition ${category === item.label
+                    ? "bg-violet-700 text-white"
+                    : "bg-violet-100 text-violet-700 hover:bg-violet-200"
+                    }`}
                 >
                   {item.label}
                 </button>
@@ -270,9 +273,8 @@ export default function Catalogo() {
                     onClick={() => setPage(pageNumber)}
                     disabled={loading}
                     aria-current={page === pageNumber ? "page" : undefined}
-                    className={`min-w-7 rounded px-2 py-1 text-[10px] font-semibold disabled:opacity-40 ${
-                      page === pageNumber ? "bg-violet-700 text-white" : "text-slate-500 hover:bg-violet-100"
-                    }`}
+                    className={`min-w-7 rounded px-2 py-1 text-[10px] font-semibold disabled:opacity-40 ${page === pageNumber ? "bg-violet-700 text-white" : "text-slate-500 hover:bg-violet-100"
+                      }`}
                   >
                     {pageNumber}
                   </button>
