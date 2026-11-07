@@ -13,6 +13,7 @@ import LivroDetalhes from "./pages/livroDetalhes";
 import Catalogo from "./pages/catalogo";
 import Colecao from "./pages/colecao";
 import { ProtectedRoute } from "./route/protectedRoute";
+import BookCardExample from "./components/BookCard.example";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -29,6 +30,9 @@ createRoot(document.getElementById("root")).render(
         <Route path="/nova-senha" element={<NovaSenha />} />
         {import.meta.env.DEV && (
           <Route path="/dev/livros/:id" element={<LivroDetalhes />} />
+        )}
+        {import.meta.env.DEV && (
+         <Route path="/dev/book-card" element={<BookCardExample />} />
         )}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<Home />} />
