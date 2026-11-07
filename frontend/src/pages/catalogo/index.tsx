@@ -1,299 +1,391 @@
-import { useEffect, useState } from "react";
-import { Bookmark } from "lucide-react"
-import { Link } from "react-router-dom";
-import SearchBooks from "../../components/SearchBooks";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import SiteHeader from "../../components/SiteHeader";
 import SiteFooter from "../../components/SiteFooter";
-import { useRequireAuth } from "../../hooks/useRequireAuth";
-import type { Book } from "../../data/books";
-import {
-  getTrendingBooks,
-  searchBooks,
-  type OpenLibrarySort,
-} from "../../services/api_openlibery";
+import BookCard from "../../components/BookCard";
 
-interface Category {
-  label: string;
-  subject?: string;
+type ReadingStatus = "Quero ler" | "Lendo" | "Lido";
+type StatusFilter = "Todos" | ReadingStatus;
+
+interface CollectionBook {
+  id: string;
+  title: string;
+  author: string;
+  genre: string;
+  status: ReadingStatus;
+  rating: number | null;
+  notes: string;
+  cover: string;
+  addedAt: number;
 }
 
-const categories: Category[] = [
-  { label: "Todos" },
-  { label: "Ficção", subject: "fiction" },
-  { label: "Romance", subject: "romance" },
-  { label: "Sci-fi", subject: "science fiction" },
-  { label: "Fantasia", subject: "fantasy" },
-  { label: "Biografia", subject: "biography" },
-  { label: "Autoajuda", subject: "self-help" },
+interface BookFormValues {
+  title: string;
+  author: string;
+  genre: string;
+  status: ReadingStatus;
+  rating: string;
+  notes: string;
+  cover: string;
+}
+
+const storageKey = "bookhub.collection.v1";
+const filters: StatusFilter[] = ["Todos", "Quero ler", "Lendo", "Lido"];
+
+const sampleBooks: CollectionBook[] = [
+  {
+    id: "sample-1984",
+    title: "1984",
+    author: "George Orwell",
+    genre: "Ficção distópica",
+    status: "Quero ler",
+    rating: null,
+    notes: "",
+    cover: "https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg",
+    addedAt: 6,
+  },
+  {
+    id: "sample-hora-da-estrela",
+    title: "A hora da estrela",
+    author: "Clarice Lispector",
+    genre: "Romance",
+    status: "Lido",
+    rating: 5,
+    notes: "",
+    cover: "https://covers.openlibrary.org/b/isbn/9788520925688-L.jpg",
+    addedAt: 5,
+  },
+  {
+    id: "sample-dom-casmurro",
+    title: "Dom Casmurro",
+    author: "Machado de Assis",
+    genre: "Romance",
+    status: "Lido",
+    rating: 5,
+    notes: "",
+    cover: "https://covers.openlibrary.org/b/isbn/9788594318241-L.jpg",
+    addedAt: 4,
+  },
+  {
+    id: "sample-pequeno-principe",
+    title: "O pequeno príncipe",
+    author: "Antoine de Saint-Exupéry",
+    genre: "Fábula",
+    status: "Lido",
+    rating: 4,
+    notes: "",
+    cover: "https://covers.openlibrary.org/b/isbn/9788535902778-L.jpg",
+    addedAt: 3,
+  },
+  {
+    id: "sample-quarto-de-despejo",
+    title: "Quarto de despejo",
+    author: "Carolina Maria de Jesus",
+    genre: "Diário",
+    status: "Quero ler",
+    rating: null,
+    notes: "",
+    cover: "https://covers.openlibrary.org/b/isbn/9788508171279-L.jpg",
+    addedAt: 2,
+  },
+  {
+    id: "sample-torto-arado",
+    title: "Torto arado",
+    author: "Itamar Vieira Junior",
+    genre: "Romance",
+    status: "Quero ler",
+    rating: null,
+    notes: "",
+    cover: "https://covers.openlibrary.org/b/isbn/9786580309313-L.jpg",
+    addedAt: 1,
+  },
 ];
 
-/** Gênero carregado na primeira visita ao catálogo. */
-const DEFAULT_CATEGORY = "Ficção";
+const emptyForm: BookFormValues = {
+  title: "",
+  author: "",
+  genre: "",
+  status: "Quero ler",
+  rating: "",
+  notes: "",
+  cover: "",
+};
 
-const booksPerPage = 8;
-
-function BookCard({ book }: { book: Book }) {
-  const [added, setAdded] = useState(false);
-  const { requireAuth } = useRequireAuth();
-
-  function toggleAdded() {
-    if (!requireAuth("Você precisa estar logado para adicionar livros à sua estante.")) return;
-    setAdded((current) => !current);
+function readCollection(): CollectionBook[] {
+  try {
+    const stored = localStorage.getItem(storageKey);
+    if (stored === null) return sampleBooks;
+    const parsed: unknown = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed as CollectionBook[] : sampleBooks;
+  } catch {
+    return sampleBooks;
   }
-
-  return (
-    <article className="flex flex-col overflow-hidden rounded-md border border-slate-100 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-      <Link
-        to={`/livros/${book.id}`}
-        aria-label={`Ver detalhes de ${book.title}`}
-        className="group flex h-28 items-center justify-center bg-slate-50 sm:h-36"
-      >
-        {book.cover ? (
-          <img
-            src={book.cover}
-            alt={`Capa de ${book.title}`}
-            loading="lazy"
-            className="h-full w-full object-contain p-2"
-          />
-        ) : (
-          <span className="px-2 text-center text-[10px] text-slate-300 transition group-hover:text-violet-400">
-            Capa do livro
-          </span>
-        )}
-      </Link>
-      <div className="flex flex-1 flex-col p-3 gap-1">
-        <Link to={`/livros/${book.id}`} className="truncate text-[16px] font-medium text-slate-900 hover:text-violet-700">
-          {book.title}
-        </Link>
-        <p className="mt-0.5 truncate text-[14px] text-slate-500">
-          {book.author}
-          {book.genres[0] ? ` · ${book.genres[0]}` : ""}
-          {book.rating > 0 ? ` · ★ ${book.rating.toFixed(1)}` : ""}
-        </p>
-        <div className="flex flex-row items-center justify-between gap-1">
-          <Link
-            className={` rounded-md cursor-pointer px-2 py-1.5 text-[10px] bg-violet-700 font-semibold w-full text-center text-white transition-all hover:scale-[102%]
-  `} to={`/livros/${book.id}`}>
-
-            Ver mais
-          </Link>
-          <button type="button"
-            onClick={toggleAdded}
-            aria-pressed={added}
-            className={`   rounded-md cursor-pointer transition-all hover:scale-[102%] bg-transparent" `}>
-            <Bookmark size={24} className={`${added ? "stroke-red-600 fill-red-600" : "stroke-gray-500"} `} strokeWidth={1.5} />
-          </button>
-        </div>
-      </div>
-    </article>
-  );
 }
 
-function BookCardSkeleton() {
-  return (
-    <div className="flex flex-col overflow-hidden rounded-md border border-slate-100 bg-white shadow-sm">
-      <div className="h-28 animate-pulse bg-slate-100 sm:h-36" />
-      <div className="space-y-2 p-3">
-        <div className="h-2.5 w-3/4 animate-pulse rounded bg-slate-100" />
-        <div className="h-2 w-1/2 animate-pulse rounded bg-slate-100" />
-        <div className="mt-2 h-6 animate-pulse rounded bg-slate-100" />
-      </div>
-    </div>
-  );
-}
-
-export default function Catalogo() {
-  const [category, setCategory] = useState(DEFAULT_CATEGORY);
-  const [sort, setSort] = useState<OpenLibrarySort>("relevance");
-  const [page, setPage] = useState(1);
-
-  const [books, setBooks] = useState<Book[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
+function BookForm({
+  initialValues,
+  onCancel,
+  onSave,
+}: {
+  initialValues: BookFormValues;
+  onCancel: () => void;
+  onSave: (values: BookFormValues) => void;
+}) {
+  const [values, setValues] = useState(initialValues);
   const [error, setError] = useState("");
-  const [reloadKey, setReloadKey] = useState(0);
 
-  const activeCategory = categories.find((item) => item.label === category) ?? categories[0];
+  function update<K extends keyof BookFormValues>(key: K, value: BookFormValues[K]) {
+    setValues((current) => ({ ...current, [key]: value }));
+  }
 
-  // Busca inicial e a cada mudança de gênero, ordenação ou página.
-  useEffect(() => {
-    let active = true;
-
-    async function loadBooks() {
-      setLoading(true);
-      setError("");
-
-      try {
-        const subject = activeCategory.subject;
-
-        if (subject) {
-          const { books: results, total: found } = await searchBooks({
-            genre: subject,
-            sort,
-            page,
-            limit: booksPerPage,
-          });
-          if (!active) return;
-          setBooks(results);
-          setTotal(found);
-        } else {
-          const results = await getTrendingBooks(booksPerPage);
-          if (!active) return;
-          setBooks(results);
-          setTotal(results.length);
-        }
-      } catch {
-        if (!active) return;
-        setBooks([]);
-        setTotal(0);
-        setError("Não foi possível carregar os livros agora. Tente novamente.");
-      } finally {
-        if (active) setLoading(false);
-      }
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!values.title.trim() || !values.author.trim()) {
+      setError("Preencha o título e o autor.");
+      return;
     }
-
-    loadBooks();
-
-    return () => {
-      active = false;
-    };
-  }, [activeCategory.subject, sort, page, reloadKey]);
-
-  const pageCount = Math.max(1, Math.ceil(total / booksPerPage));
-  const firstVisiblePage = Math.max(1, Math.min(page - 2, pageCount - 4));
-  const visiblePages = Array.from(
-    { length: Math.min(5, pageCount) },
-    (_, index) => firstVisiblePage + index,
-  );
-
-  function selectCategory(nextCategory: string) {
-    setCategory(nextCategory);
-    setPage(1);
+    onSave(values);
   }
 
-  function changeSort(value: string) {
-    setSort(value as OpenLibrarySort);
-    setPage(1);
-  }
-
-  const showEmptyState = !loading && books.length === 0 && !error;
+  const fieldClass = "mt-1 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100";
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <form onSubmit={submit} className="space-y-3">
+      <label className="block text-xs font-semibold text-slate-700">
+        Título *
+        <input autoFocus value={values.title} onChange={(event) => update("title", event.target.value)} className={fieldClass} maxLength={120} />
+      </label>
+      <label className="block text-xs font-semibold text-slate-700">
+        Autor *
+        <input value={values.author} onChange={(event) => update("author", event.target.value)} className={fieldClass} maxLength={100} />
+      </label>
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block text-xs font-semibold text-slate-700">
+          Gênero
+          <input value={values.genre} onChange={(event) => update("genre", event.target.value)} className={fieldClass} maxLength={60} />
+        </label>
+        <label className="block text-xs font-semibold text-slate-700">
+          Status
+          <select value={values.status} onChange={(event) => update("status", event.target.value as ReadingStatus)} className={fieldClass}>
+            <option>Quero ler</option>
+            <option>Lendo</option>
+            <option>Lido</option>
+          </select>
+        </label>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block text-xs font-semibold text-slate-700">
+          Nota pessoal
+          <select value={values.rating} onChange={(event) => update("rating", event.target.value)} className={fieldClass}>
+            <option value="">Sem avaliação</option>
+            {[1, 2, 3, 4, 5].map((rating) => <option key={rating} value={rating}>{rating} de 5</option>)}
+          </select>
+        </label>
+        <label className="block text-xs font-semibold text-slate-700">
+          URL da capa
+          <input type="url" value={values.cover} onChange={(event) => update("cover", event.target.value)} className={fieldClass} placeholder="https://..." />
+        </label>
+      </div>
+      <label className="block text-xs font-semibold text-slate-700">
+        Observações
+        <textarea value={values.notes} onChange={(event) => update("notes", event.target.value)} className={`${fieldClass} resize-y`} rows={3} maxLength={500} />
+      </label>
+      {error && <p role="alert" className="text-xs text-red-600">{error}</p>}
+      <div className="flex justify-end gap-2 pt-1">
+        <button type="button" onClick={onCancel} className="rounded-md border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancelar</button>
+        <button type="submit" className="rounded-md bg-violet-700 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-800">Salvar livro</button>
+      </div>
+    </form>
+  );
+}
+
+export default function Colecao() {
+  const [books, setBooks] = useState<CollectionBook[]>(readCollection);
+  const [filter, setFilter] = useState<StatusFilter>("Todos");
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("title");
+  const [editing, setEditing] = useState<CollectionBook | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<CollectionBook | null>(null);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(books));
+  }, [books]);
+
+  const visibleBooks = useMemo(() => {
+    const query = search.trim().toLocaleLowerCase("pt-BR");
+    return books
+      .filter((book) => filter === "Todos" || book.status === filter)
+      .filter((book) => !query || `${book.title} ${book.author}`.toLocaleLowerCase("pt-BR").includes(query))
+      .sort((left, right) => {
+        if (sort === "author") return left.author.localeCompare(right.author, "pt-BR");
+        if (sort === "date") return right.addedAt - left.addedAt;
+        return left.title.localeCompare(right.title, "pt-BR");
+      });
+  }, [books, filter, search, sort]);
+
+  function saveBook(values: BookFormValues) {
+    if (editing) {
+      setBooks((current) => current.map((book) => book.id === editing.id ? {
+        ...book,
+        title: values.title.trim(),
+        author: values.author.trim(),
+        genre: values.genre.trim() || "Sem gênero",
+        status: values.status,
+        rating: values.rating ? Number(values.rating) : null,
+        notes: values.notes.trim(),
+        cover: values.cover.trim(),
+      } : book));
+      setEditing(null);
+      setNotice("Livro atualizado na coleção.");
+    } else {
+      setBooks((current) => [{
+        id: crypto.randomUUID(),
+        title: values.title.trim(),
+        author: values.author.trim(),
+        genre: values.genre.trim() || "Sem gênero",
+        status: values.status,
+        rating: values.rating ? Number(values.rating) : null,
+        notes: values.notes.trim(),
+        cover: values.cover.trim(),
+        addedAt: Date.now(),
+      }, ...current]);
+      setAdding(false);
+      setNotice("Livro adicionado à coleção.");
+    }
+    window.setTimeout(() => setNotice(""), 2800);
+  }
+
+  function formValues(book: CollectionBook): BookFormValues {
+    return {
+      title: book.title,
+      author: book.author,
+      genre: book.genre,
+      status: book.status,
+      rating: book.rating ? String(book.rating) : "",
+      notes: book.notes,
+      cover: book.cover,
+    };
+  }
+
+  const hasActiveSearch = Boolean(search.trim()) || filter !== "Todos";
+
+  return (
+    <div className="min-h-screen bg-[#f7f7fb] font-sans text-slate-900">
       <SiteHeader />
 
-      <main>
-        <section className="bg-gradient-to-r from-violet-800 via-violet-700 to-purple-600 text-white">
-          <div className="mx-auto max-w-6xl px-5 py-6 sm:py-8">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-200">BookHub</p>
-            <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Explore nosso catálogo</h1>
-            <p className="mt-1 max-w-xl text-xs leading-5 text-violet-100">
-              Encontre sua próxima leitura entre histórias, ideias e novos mundos.
-            </p>
+      <main className="mx-auto min-h-[calc(100vh-126px)] max-w-6xl px-5 py-5 sm:py-7">
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-bold">Minha coleção</h1>
+            <p className="mt-0.5 text-[10px] text-slate-500">{books.length} {books.length === 1 ? "livro na sua coleção" : "livros na sua coleção"}</p>
           </div>
-        </section>
+          <button type="button" onClick={() => setAdding(true)} className="rounded-md bg-violet-700 px-3 py-2 text-[11px] font-semibold text-white shadow-sm hover:bg-violet-800">＋ Adicionar livro</button>
+        </div>
 
-        <section className="mx-auto max-w-6xl px-5 py-5" aria-label="Catálogo de livros">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap items-center gap-2" aria-label="Filtrar por categoria">
-              {categories.map((item) => (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => selectCategory(item.label)}
-                  aria-pressed={category === item.label}
-                  className={`rounded-full px-3 py-1.5 text-[10px] font-semibold transition ${category === item.label
-                    ? "bg-violet-700 text-white"
-                    : "bg-violet-100 text-violet-700 hover:bg-violet-200"
-                    }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-              <label className="ml-auto flex items-center gap-2 text-[10px] text-slate-500">
-                Ordenar por
-                <select
-                  value={sort}
-                  onChange={(event) => changeSort(event.target.value)}
-                  className="rounded border border-slate-200 bg-white px-2 py-1.5 text-[10px] text-slate-700 outline-none focus:ring-2 focus:ring-violet-300"
-                >
-                  <option value="relevance">Mais relevantes</option>
-                  <option value="rating">Melhor avaliados</option>
-                  <option value="new">Mais recentes</option>
-                  <option value="old">Mais antigos</option>
-                  <option value="title">Título (A-Z)</option>
-                </select>
-              </label>
-            </div>
+        <label className="block">
+          <span className="sr-only">Buscar por título ou autor</span>
+          <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por título ou autor" className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-[11px] outline-none placeholder:text-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-100" />
+        </label>
 
-            <div className="sm:hidden">
-              <SearchBooks className="w-full" placeholder="Buscar por título, autor..." />
-            </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filtrar por status">
+            {filters.map((option) => (
+              <button key={option} type="button" onClick={() => setFilter(option)} aria-pressed={filter === option} className={`rounded border px-2.5 py-1.5 text-[10px] font-medium transition ${filter === option ? "border-violet-600 bg-violet-50 text-violet-700" : "border-slate-200 bg-white text-slate-600 hover:border-violet-300"}`}>
+                {option}{option === "Todos" ? ` ${books.length}` : ` ${books.filter((book) => book.status === option).length}`}
+              </button>
+            ))}
+          </div>
+          <label className="ml-auto flex items-center gap-2 text-[10px] text-slate-500">
+            <span className="hidden sm:inline">Ordenar:</span>
+            <select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Ordenar coleção" className="rounded border border-slate-200 bg-white px-2 py-1.5 text-[10px] text-slate-700 outline-none focus:ring-2 focus:ring-violet-200">
+              <option value="title">Título</option>
+              <option value="author">Autor</option>
+              <option value="date">Data de adição</option>
+            </select>
+          </label>
+        </div>
 
-            {error && (
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700" role="alert">
-                <span>{error}</span>
-                <button
-                  type="button"
-                  onClick={() => setReloadKey((current) => current + 1)}
-                  className="rounded-md bg-red-700 px-3 py-1.5 text-[10px] font-semibold text-white hover:bg-red-800"
-                >
-                  Tentar novamente
-                </button>
-              </div>
-            )}
+        <p className="my-3 text-[10px] text-slate-500" aria-live="polite">{visibleBooks.length} livros • {filter === "Todos" ? "Todos os status" : filter}</p>
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-busy={loading}>
-              {loading
-                ? Array.from({ length: booksPerPage }, (_, index) => <BookCardSkeleton key={index} />)
-                : books.map((book) => <BookCard key={book.id} book={book} />)}
-            </div>
+        {visibleBooks.length ? (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            {visibleBooks.map((book) => (
+              <div key={book.id} className="relative mx-auto w-full max-w-[200px]">
+                <BookCard
+                  book={{
+                    id: book.id,
+                    title: book.title,
+                    author: book.author,
+                    coverUrl: book.cover,
+                    status: book.status,
+                    rating: book.rating,
+                  }}
+                />
 
-            {showEmptyState && (
-              <p className="rounded-lg border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
-                Nenhum livro encontrado. Tente outra busca ou categoria.
-              </p>
-            )}
-
-            {pageCount > 1 && (
-              <nav className="flex items-center justify-center gap-1 pt-1" aria-label="Paginação do catálogo">
-                <button
-                  type="button"
-                  onClick={() => setPage((current) => Math.max(1, current - 1))}
-                  disabled={page === 1 || loading}
-                  className="rounded px-2 py-1 text-xs text-slate-500 hover:bg-violet-100 disabled:opacity-40"
-                  aria-label="Página anterior"
-                >
-                  ‹
-                </button>
-                {visiblePages.map((pageNumber) => (
+                <div className="absolute right-1.5 top-1.5">
                   <button
-                    key={pageNumber}
                     type="button"
-                    onClick={() => setPage(pageNumber)}
-                    disabled={loading}
-                    aria-current={page === pageNumber ? "page" : undefined}
-                    className={`min-w-7 rounded px-2 py-1 text-[10px] font-semibold disabled:opacity-40 ${page === pageNumber ? "bg-violet-700 text-white" : "text-slate-500 hover:bg-violet-100"
-                      }`}
+                    aria-label={`Ações para ${book.title}`}
+                    aria-expanded={openMenu === book.id}
+                    onClick={() => setOpenMenu((current) => (current === book.id ? null : book.id))}
+                    className="grid h-7 w-7 place-items-center rounded bg-white/90 text-lg leading-none text-violet-700 shadow hover:bg-white"
                   >
-                    {pageNumber}
+                    ⋯
                   </button>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
-                  disabled={page === pageCount || loading}
-                  className="rounded px-2 py-1 text-xs text-slate-500 hover:bg-violet-100 disabled:opacity-40"
-                  aria-label="Próxima página"
-                >
-                  ›
-                </button>
-              </nav>
-            )}
+                  {openMenu === book.id && (
+                    <div className="absolute right-0 top-8 z-10 w-32 rounded-md border border-slate-200 bg-white p-1 shadow-lg">
+                      <button type="button" onClick={() => { setEditing(book); setOpenMenu(null); }} className="w-full rounded px-2 py-1.5 text-left text-[10px] text-slate-700 hover:bg-slate-50">Editar</button>
+                      <button type="button" onClick={() => { setDeleteTarget(book); setOpenMenu(null); }} className="w-full rounded px-2 py-1.5 text-left text-[10px] text-red-600 hover:bg-red-50">Remover</button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
-        </section>
+        ) : (
+          <section className="grid min-h-[300px] place-items-center rounded-md border border-slate-200 bg-white px-5 py-12 text-center" aria-label="Coleção vazia">
+            <div>
+              <span className="mx-auto grid h-10 w-10 place-items-center rounded-full bg-violet-100 text-lg text-violet-700" aria-hidden="true">⌕</span>
+              <h2 className="mt-3 text-sm font-bold">{hasActiveSearch ? "Nenhum livro encontrado" : "Sua próxima leitura começa aqui"}</h2>
+              <p className="mt-1 text-[10px] text-slate-500">{hasActiveSearch ? "Não encontramos livros com esses critérios." : "Adicione seu primeiro livro à coleção."}</p>
+              {hasActiveSearch ? (
+                <button type="button" onClick={() => { setSearch(""); setFilter("Todos"); }} className="mt-3 rounded-md border border-slate-200 px-3 py-1.5 text-[10px] font-semibold text-slate-700 hover:bg-slate-50">Limpar busca</button>
+              ) : (
+                <button type="button" onClick={() => setAdding(true)} className="mt-3 rounded-md bg-violet-700 px-3 py-2 text-[10px] font-semibold text-white hover:bg-violet-800">＋ Adicionar livro</button>
+              )}
+            </div>
+          </section>
+        )}
       </main>
+
       <SiteFooter />
+
+      {(adding || editing || deleteTarget) && (
+        <div className="fixed inset-0 z-30 grid place-items-center overflow-y-auto bg-slate-950/40 p-4" onMouseDown={(event) => { if (event.target === event.currentTarget) { setAdding(false); setEditing(null); setDeleteTarget(null); } }}>
+          {deleteTarget ? (
+            <section role="dialog" aria-modal="true" aria-labelledby="remove-title" className="w-full max-w-sm rounded-lg bg-white p-5 shadow-xl">
+              <h2 id="remove-title" className="text-base font-bold">Remover livro?</h2>
+              <p className="mt-2 text-sm text-slate-600">“{deleteTarget.title}” será removido da sua coleção.</p>
+              <div className="mt-5 flex justify-end gap-2">
+                <button type="button" onClick={() => setDeleteTarget(null)} className="rounded-md border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600">Cancelar</button>
+                <button type="button" onClick={() => { setBooks((current) => current.filter((book) => book.id !== deleteTarget.id)); setDeleteTarget(null); setNotice("Livro removido da coleção."); window.setTimeout(() => setNotice(""), 2800); }} className="rounded-md bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700">Remover</button>
+              </div>
+            </section>
+          ) : (
+            <section role="dialog" aria-modal="true" aria-labelledby="form-title" className="w-full max-w-lg rounded-lg bg-white p-5 shadow-xl">
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div><h2 id="form-title" className="text-base font-bold">{editing ? "Editar livro" : "Adicionar livro"}</h2><p className="mt-1 text-xs text-slate-500">Os campos com * são obrigatórios.</p></div>
+                <button type="button" aria-label="Fechar" onClick={() => { setAdding(false); setEditing(null); }} className="rounded px-2 py-1 text-lg leading-none text-slate-500 hover:bg-slate-100">×</button>
+              </div>
+              <BookForm key={editing?.id ?? "new-book"} initialValues={editing ? formValues(editing) : emptyForm} onCancel={() => { setAdding(false); setEditing(null); }} onSave={saveBook} />
+            </section>
+          )}
+        </div>
+      )}
+
+      {notice && <div role="status" className="fixed bottom-5 left-1/2 z-40 -translate-x-1/2 rounded-md bg-slate-900 px-4 py-2.5 text-xs font-medium text-white shadow-lg">{notice}</div>}
     </div>
   );
 }
