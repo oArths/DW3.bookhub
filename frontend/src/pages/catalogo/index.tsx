@@ -80,8 +80,8 @@ function BookCard({ book }: { book: Book }) {
           <button type="button"
             onClick={toggleAdded}
             aria-pressed={added}
-            className={`  p-1 border border-gray-600 rounded-md cursor-pointer transition-all hover:scale-[102%] ${added ? " bg-gray-800" : "bg-transparent"}`}>
-            <Bookmark size={20} className={`${added ? "stroke-gray-100" : "stroke-gray-800"} `} strokeWidth={1.5} />
+            className={`   rounded-md cursor-pointer transition-all hover:scale-[102%] bg-transparent" `}>
+            <Bookmark size={24} className={`${added ? "stroke-red-600 fill-red-600" : "stroke-gray-500"} `} strokeWidth={1.5} />
           </button>
         </div>
       </div>

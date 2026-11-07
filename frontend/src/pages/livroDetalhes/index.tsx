@@ -6,6 +6,7 @@ import { useRequireAuth } from "../../hooks/useRequireAuth";
 import SiteHeader from "../../components/SiteHeader";
 import SiteFooter from "../../components/SiteFooter";
 import ReviewForm from "../../components/ReviewForm";
+import { Bookmark } from "lucide-react";
 
 interface BookDetailsProps {
   book?: Book;
@@ -173,7 +174,13 @@ export default function LivroDetalhes({
       </div>
     );
   }
+  const [added, setAdded] = useState(false);
 
+
+  function toggleAdded() {
+    if (!requireAuth("Você precisa estar logado para adicionar livros à sua estante.")) return;
+    setAdded((current) => !current);
+  }
   const details: [string, string][] = [
     ["Editora", book.publisher],
     ["Publicação", book.publicationDate],
@@ -303,9 +310,8 @@ export default function LivroDetalhes({
                     type="button"
                     onClick={toggleWantsToRead}
                     aria-pressed={wantsToRead}
-                    className={`rounded-lg px-4 py-2 text-xs font-semibold text-white transition ${
-                      wantsToRead ? "bg-emerald-600 hover:bg-emerald-700" : "bg-violet-700 hover:bg-violet-800"
-                    }`}
+                    className={`rounded-lg px-4 py-2 text-xs font-semibold text-white transition ${wantsToRead ? "bg-emerald-600 hover:bg-emerald-700" : "bg-violet-700 hover:bg-violet-800"
+                      }`}
                   >
                     {wantsToRead ? "Adicionado à estante" : "Adicionar à estante"}
                   </button>
@@ -317,13 +323,11 @@ export default function LivroDetalhes({
                   >
                     {hasRead ? "Marcar como não lido" : "Marcar como lido"}
                   </button>
-                  <button
-                    type="button"
-                    onClick={toggleSaved}
-                    aria-pressed={saved}
-                    className="rounded-lg border border-violet-300 px-4 py-2 text-xs font-semibold text-violet-700 hover:bg-violet-50"
-                  >
-                    {saved ? "Salvo" : "Salvar"}
+                  <button type="button"
+                    onClick={toggleAdded}
+                    aria-pressed={added}
+                    className={`   rounded-md cursor-pointer transition-all hover:scale-[102%] bg-transparent" `}>
+                    <Bookmark size={24} className={`${added ? "stroke-red-600 fill-red-600" : "stroke-gray-500"} `} strokeWidth={1.5} />
                   </button>
                 </div>
               </div>
