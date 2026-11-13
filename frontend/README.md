@@ -1,69 +1,44 @@
-# BookHub Front-end
+# BookHub Frontend
 
-Front-end do BookHub utilizando React, Vite e Tailwind CSS.
+Frontend React com Vite. O catálogo usa a Open Library diretamente; chamadas à API BookHub usam o endereço `http://localhost:3000` definido em `src/services/api.ts`.
 
 ## Requisitos
 
-- Node.js 18 ou superior
-- npm
-- Backend do BookHub disponível em `http://localhost:3000` para testar a integração
+- Node.js 20.19+ ou 22.12+ e npm.
+- Backend disponível em `http://localhost:3000` para os fluxos que usam a API.
 
-## Instalação
+## Instalação e scripts
 
-Na pasta `frontend`, instale as dependências:
-
-```bash
-npm install
-```
-
-Crie o arquivo `.env` a partir do exemplo:
+Na pasta `frontend`:
 
 ```bash
-cp .env.example .env
-```
-
-A variável `VITE_API_URL` define o endereço do backend usado pelo proxy de desenvolvimento:
-
-```env
-VITE_API_URL=http://localhost:3000
-```
-
-## Scripts
-
-Iniciar o servidor de desenvolvimento:
-
-```bash
+npm ci
 npm run dev
 ```
 
-O front-end ficará disponível em `http://localhost:5173`.
-
-Gerar a versão de produção:
+O Vite normalmente disponibiliza o site em `http://localhost:5173`.
 
 ```bash
 npm run build
-```
-
-Executar a pré-visualização do build:
-
-```bash
 npm run preview
-```
-
-Verificar o código com ESLint:
-
-```bash
 npm run lint
 ```
 
-## Estrutura principal
+O proxy `/api` configurado em `vite.config.js` não é usado pelo cliente Axios atual, cuja URL base é `http://localhost:3000`. Não há `.env.example` no repositório.
+
+## Organização
 
 ```text
 src/                    Aplicação React
-public/bookhub/         Páginas estáticas e recursos de autenticação
-public/bookhub/css/     Estilos das telas públicas
-public/bookhub/js/      Configuração e comportamento de autenticação
-vite.config.js          Configuração do Vite e proxy da API
+src/pages/              Telas da aplicação
+src/services/           Serviços BookHub e Open Library
+src/store/              Estado persistido no navegador
+public/bookhub/         Páginas e recursos estáticos
+vite.config.js          Configuração do Vite
 ```
 
-O arquivo `.env` contém configurações locais e não deve ser enviado ao repositório. O arquivo `.env.example` é o modelo versionado para os demais ambientes.
+Para os passos de uso, consulte o [manual](../docs/manual-usuario.md). Para o contrato dos endpoints, consulte [API](../docs/api.md).
+
+## Limitações conhecidas
+
+O arquivo `src/main.jsx` importa `./components/BookCard.example`, que não existe atualmente. Por isso, `npm run build` falha até que essa importação/componente seja corrigida.

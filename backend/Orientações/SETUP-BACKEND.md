@@ -1,64 +1,50 @@
-# BookHub — Guia de Setup do Back-end
+# Setup do backend BookHub
 
-Este guia é para quem vai integrar o front-end (React) com essa API. Siga a ordem abaixo.
+## Requisitos
 
-## 1. Pré-requisitos
+- Node.js 20.19+ ou 22.12+ e npm.
+- Instância MongoDB e URI de conexão.
+- Credenciais Resend para testar recuperação de senha.
+- Credenciais Penguin Random House somente para `GET /livros/busca`.
 
-- Ter o **Node.js** instalado (versão 18 ou superior). Para conferir, rode no terminal: `node -v`
-- Ter um editor de código (recomendado: VS Code)
+## Instalação e configuração
 
-## 2. Pegar o código
+Na pasta `backend`:
 
-Peça para quem está com o projeto (provavelmente eu) compartilhar a pasta do back-end com você — por exemplo, subindo num repositório do GitHub e te dando acesso, ou compactando a pasta e enviando por outro meio.
-
-**Importante:** o arquivo `.env` (com a senha do banco) **não deve ser compartilhado pelo GitHub** — ele deve ser enviado separadamente, por uma mensagem privada, e nunca commitado. Se o projeto for para o GitHub, confirme que existe um arquivo `.gitignore` com a linha `.env` dentro dele.
-
-## 3. Instalar as dependências
-
-Dentro da pasta do projeto, no terminal, rode:
-
-```
-npm install
+```bash
+npm ci
 ```
 
-Isso lê o `package.json` e baixa automaticamente todos os pacotes usados (express, mongoose, cors, dotenv, bcryptjs).
+Crie um arquivo `.env` na pasta `backend`:
 
-## 4. Configurar a conexão com o banco
-
-Crie um arquivo chamado exatamente `.env` na raiz do projeto (mesmo nível do `server.js`) com este conteúdo, usando os dados reais que quem está com o projeto vai te passar:
-
-```
-MONGO_URI=mongodb+srv://usuario:senha@endereco-do-cluster.mongodb.net/bookhub?appName=NomeDoApp
+```dotenv
+MONGO_URI=<uri-do-mongodb>
 PORT=3000
-PRH_USERNAME=usuario_fornecido_pela_penguin_random_house
-PRH_PASSWORD=senha_fornecida_pela_penguin_random_house
+RESEND_API_KEY=<chave-resend>
+RESEND_FROM_EMAIL=<remetente-verificado-no-resend>
+PRH_USERNAME=<usuario-prh>
+PRH_PASSWORD=<senha-prh>
 ```
 
-As credenciais da API Penguin Random House são necessárias para a busca de livros e devem ser obtidas junto ao provedor. Não compartilhe nem versione o arquivo `.env`.
+`PORT` é opcional (padrão `3000`). `RESEND_FROM_EMAIL` é opcional e o código usa `BookHub <onboarding@resend.dev>` quando omitida. `PRH_USERNAME` e `PRH_PASSWORD` são usados apenas pela busca de livros no backend. Não versione nem compartilhe segredos do `.env`.
 
-## 5. Rodar o servidor
+## Iniciar e testar
 
+```bash
+npm start
 ```
-node server.js
-```
 
-Se aparecer `Conectado ao MongoDB com sucesso!` e `Servidor rodando em http://localhost:3000`, está tudo certo.
+O servidor conecta ao MongoDB e escuta em `http://localhost:3000`. Teste `GET /` para verificar a resposta de saúde. Os endpoints e exemplos estão em [API-INTEGRACAO.md](API-INTEGRACAO.md) e na [especificação completa](../../docs/api.md).
 
-## 6. Testar antes de conectar o React
+## Limitações de segurança
 
-Antes de escrever qualquer código no front-end, use o **Thunder Client** (extensão do VS Code) ou o Postman para confirmar que as rotas respondem. Veja o arquivo `API-INTEGRACAO.md` para a lista completa de rotas, exemplos de corpo (body) de cada requisição, e um exemplo de código usando `fetch` no React.
+O backend não valida JWT ou sessão e não associa `usuarioId` enviado pelo cliente a uma identidade autenticada. O CORS está aberto. A configuração atual é apropriada apenas para desenvolvimento/demonstração; não publique o serviço sem implementar autenticação, autorização e política de CORS adequada.
 
-## 7. Chamando a API a partir do React
+## Problemas comuns
 
-- A URL base durante o desenvolvimento é `http://localhost:3000`
-- O CORS já está liberado no back-end, então chamadas do React (rodando em outra porta, tipo `http://localhost:5173`) funcionam sem bloqueio
-- Guarde essa URL base numa variável de ambiente do próprio React (ex: `VITE_API_URL`), para facilitar trocar o endereço quando o back-end for para produção
-
-## Em caso de erro
-
-| Erro | Causa provável |
+| Sintoma | Verificação |
 |---|---|
-| `ECONNREFUSED` ou "conexão recusada" no navegador | O back-end não está rodando — confirme com `node server.js` |
-| `MODULE_NOT_FOUND` | Alguma pasta (`models`, `routes`, `config`) não está no lugar certo, ou faltou rodar `npm install` |
-| `404 Not Found` numa rota | Confira se a URL e o método (GET/POST) estão corretos, comparando com o `API-INTEGRACAO.md` |
-| CORS bloqueado no console do navegador | Confirme que `app.use(cors())` está no `server.js` e que o servidor foi reiniciado depois da mudança |
+| Servidor não inicia ou falha ao conectar | Confira `MONGO_URI`, conectividade e permissões de rede do MongoDB |
+| `MODULE_NOT_FOUND` | Execute `npm ci` na pasta `backend` |
+| `502` em `/livros/busca` | Confira `PRH_USERNAME` e `PRH_PASSWORD` e a disponibilidade do provedor |
+| Código de recuperação não chega | Confira a chave e remetente Resend e os logs do servidor |
